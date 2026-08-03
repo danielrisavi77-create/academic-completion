@@ -44,6 +44,7 @@ export type EvidenceState = {
 
 export type MentorState = {
   lastSentAt: string | null;
+  lastSentVersionLabel?: string | null;
   lastSeenVersionLabel: string | null;
   waitingForMentor: boolean;
   topicApproved?: EvidenceState;
