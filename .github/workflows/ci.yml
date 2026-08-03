@@ -24,6 +24,9 @@ jobs:
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
+      - name: Validate production E2E harness syntax
+        run: npm run check:production-e2e
+
       - name: Test
         run: npm test
 
