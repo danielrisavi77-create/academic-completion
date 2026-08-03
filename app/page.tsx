@@ -1,29 +1,59 @@
-import { AppShell } from "@/components/AppShell";
+import Link from "next/link";
 
-const statusCards = [
-  { label: "Faza", value: "Nije postavljeno", detail: "Completion Scan određuje početnu fazu." },
-  { label: "Kritični blockeri", value: "—", detail: "Nema projektnog stanja." },
-  { label: "Čeka se", value: "—", detail: "Mentor i vanjske odluke žive odvojeno." },
-];
-
-export default function Home() {
+export default function LandingPage() {
   return (
-    <AppShell>
-      <div className="page-frame">
-        <header className="topbar"><div><p className="eyebrow">Moj rad</p><h1>Projekt pod kontrolom.</h1></div><span className="alpha-badge">EPIC 1 · SHELL</span></header>
-        <section className="empty-project-card" aria-labelledby="empty-project-title">
-          <div className="empty-project-copy"><p className="eyebrow">Početno stanje</p><h2 id="empty-project-title">Još nema aktivnog akademskog projekta.</h2><p>Sljedeći Epic uvodi strukturirano project state. Completion Scan dolazi tek nakon njega; ovaj shell namjerno ne glumi podatke koje još nemamo.</p></div>
-          <button className="primary-button" disabled type="button">Completion Scan dolazi u Epicu 4</button>
-        </section>
-        <section className="status-grid" aria-label="Sažetak projektnog stanja">{statusCards.map((card) => <article className="status-card" key={card.label}><p className="status-label">{card.label}</p><p className="status-value">{card.value}</p><p className="status-detail">{card.detail}</p></article>)}</section>
-        <section className="next-action-card" aria-labelledby="next-action-title"><div className="next-action-icon" aria-hidden="true">→</div><div className="next-action-copy"><p className="eyebrow">Sljedeće</p><h2 id="next-action-title">Next Best Action ima najviši prioritet u sučelju.</h2><p>Kada postoji stvarni projekt, ovdje se prikazuje samo jedna primarna akcija i razlog zašto je upravo ona sljedeća.</p></div><button className="secondary-button" disabled type="button">Nema aktivne akcije</button></section>
-        <section className="workspace-grid">
-          <article className="workspace-panel" id="zadaci"><div className="panel-heading"><div><p className="eyebrow">Zadaci</p><h2>Otvoreno i riješeno</h2></div><span className="panel-count">0</span></div><p className="panel-empty">Task lifecycle dolazi s typed Project Stateom.</p></article>
-          <article className="workspace-panel" id="mentor"><div className="panel-heading"><div><p className="eyebrow">Mentor</p><h2>Odvojeno od tvoje akcije</h2></div><span className="panel-state">Nema podataka</span></div><p className="panel-empty">Budući state razlikuje ono što radiš ti od onoga što čeka vanjsku odluku.</p></article>
-          <article className="workspace-panel" id="provjera"><div className="panel-heading"><div><p className="eyebrow">Provjera</p><h2>Katedra ≠ Lekta</h2></div></div><div className="verification-split"><div><strong>Katedra</strong><span>Sadržajna pomoć i procjena</span></div><div><strong>Lekta</strong><span>Deterministička provjera dokumenta</span></div></div></article>
-          <article className="workspace-panel" id="dnevnik"><div className="panel-heading"><div><p className="eyebrow">Dnevnik</p><h2>Proces bez arhive teksta</h2></div></div><p className="panel-empty">Dnevnik će spremati strukturirane događaje, ne thesis body, mentorove mailove ili AI transkripte.</p></article>
-        </section>
-      </div>
-    </AppShell>
+    <main className="public-page landing-page">
+      <header className="public-header">
+        <Link className="public-brand" href="/" aria-label="Academic Completion početna">
+          <span className="brand-mark" aria-hidden="true">A</span>
+          <span>Academic Completion</span>
+        </Link>
+        <Link className="header-link" href="/project">Projektni pregled</Link>
+      </header>
+
+      <section className="landing-hero">
+        <div className="landing-hero-copy">
+          <p className="eyebrow">FPZG · Politologija pilot · završni i diplomski</p>
+          <h1>Završi rad bez nagađanja.</h1>
+          <p className="landing-lead">
+            Academic Completion prati što još trebaš riješiti, što vrijedi za tvoj FPZG projekt i koji je sljedeći najsigurniji potez. Katedra radi sa sadržajem, a Lekta provjerava dokument.
+          </p>
+          <div className="landing-actions">
+            <Link className="primary-button button-link" href="/scan">Provjeri gdje stoji moj rad</Link>
+            <span className="landing-trust">Besplatni početni Scan · bez kartice · bez slanja teksta rada</span>
+          </div>
+        </div>
+        <div className="landing-control-card" aria-label="Primjer projektnog pregleda">
+          <div className="control-card-top"><span>Diplomski rad</span><strong>37 dana</strong></div>
+          <div className="control-card-stage"><small>Faza</small><strong>Revizija drafta</strong></div>
+          <div className="control-card-row"><span className="signal signal-critical" aria-hidden="true" />2 kritična blockera</div>
+          <div className="control-card-row"><span className="signal signal-waiting" aria-hidden="true" />1 stvar čeka mentora</div>
+          <div className="control-card-next"><small>Sljedeće</small><strong>Pošalji mentorici aktualnu metodologiju.</strong></div>
+        </div>
+      </section>
+
+      <section className="landing-how" aria-labelledby="how-heading">
+        <div className="landing-section-heading"><p className="eyebrow">Kako radi</p><h2 id="how-heading">Ne dodaje još jedan chatbot. Smanjuje broj nepoznanica.</h2></div>
+        <div className="how-grid">
+          <article><span>01</span><h3>Kažeš gdje si</h3><p>Rok, faza, mentor, dokument i AI status — bez teksta rada.</p></article>
+          <article><span>02</span><h3>Dobiješ stvarno stanje</h3><p>Najviše tri stvari koje trenutno nose najveći rizik ili blokiraju napredak.</p></article>
+          <article><span>03</span><h3>Znaš što ide sljedeće</h3><p>Jedna primarna akcija s razlogom, umjesto još jedne generičke checkliste.</p></article>
+        </div>
+      </section>
+
+      <section className="landing-boundaries" aria-labelledby="boundaries-heading">
+        <div><p className="eyebrow">Academic Suite</p><h2 id="boundaries-heading">Tri specijalizirana sustava. Jedan rad.</h2></div>
+        <div className="boundary-grid">
+          <article><strong>Academic Completion</strong><span>Što je sljedeće?</span><p>Projekt, rok, blockeri, mentor i službena pravila.</p></article>
+          <article><strong>Katedra</strong><span>Kako raditi na sadržaju?</span><p>Hrvatski akademski content i writing assistance.</p></article>
+          <article><strong>Lekta</strong><span>Što je stvarno u dokumentu?</span><p>Deterministička provjera konkretnog DOCX-a.</p></article>
+        </div>
+      </section>
+
+      <section className="landing-final-cta">
+        <div><p className="eyebrow">3 minute</p><h2>Prvo saznaj što je otvoreno.</h2><p>Za pilot trenutno podržavamo FPZG Politologiju — završne i diplomske radove.</p></div>
+        <Link className="primary-button button-link" href="/scan">Pokreni Completion Scan</Link>
+      </section>
+    </main>
   );
 }
