@@ -80,6 +80,7 @@ export type CompletionProjectStateRow = {
   deadline_source_id: string | null;
   deadline_source_label: string | null;
   mentor_last_sent_at: string | null;
+  mentor_last_sent_version_label: string | null;
   mentor_last_seen_version_label: string | null;
   mentor_waiting_for_response: boolean;
   topic_approved: boolean | null;
