@@ -3,15 +3,31 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { fpzgRuleset } from "@/data/rules/fpzg/ruleset";
 import { mapDatabaseProjectToDomain } from "@/domain/persistence/project-mapper";
 import type { CreateProjectFromScanCommand } from "@/domain/persistence/scan-project-draft";
-import type {
-  AcademicProjectRow,
-  CompletionProjectStateRow,
-  CompletionTaskRow,
+import {
+  toSharedAcademicProjectStage,
+  type AcademicProjectRow,
+  type CompletionProjectStateRow,
+  type CompletionTaskRow,
 } from "@/domain/persistence/types";
 import type { AcademicProject } from "@/domain/project/types";
 
-const PROJECT_SELECT =
-  "id,owner_user_id,work_type,profile_id,title,status,created_at,updated_at";
+const PROJECT_SELECT = [
+  "id",
+  "user_id",
+  "work_type",
+  "profile_id",
+  "title",
+  "topic",
+  "institution_id",
+  "unit_id",
+  "program_id",
+  "deadline",
+  "stage",
+  "ruleset_id",
+  "ruleset_version",
+  "created_at",
+  "updated_at",
+].join(",");
 
 const STATE_SELECT = [
   "academic_project_id",
@@ -86,10 +102,16 @@ export async function createOwnedProjectFromScan({
 
   const { error: projectError } = await admin.from("academic_projects").insert({
     id: projectId,
-    owner_user_id: ownerUserId,
+    user_id: ownerUserId,
     work_type: command.databaseWorkType,
+    institution_id: fpzgRuleset.institutionId,
+    unit_id: fpzgRuleset.facultyId,
     profile_id: command.profileId,
-    status: "active",
+    academic_year: fpzgRuleset.academicYear,
+    deadline: command.targetSubmissionDate,
+    stage: toSharedAcademicProjectStage(command.stage),
+    ruleset_id: command.aiPolicyRulesetId,
+    ruleset_version: command.aiPolicyRulesetVersion,
   });
 
   if (projectError) {
@@ -143,7 +165,7 @@ export async function getOwnedProject({
     .from("academic_projects")
     .select(PROJECT_SELECT)
     .eq("id", projectId)
-    .eq("owner_user_id", ownerUserId)
+    .eq("user_id", ownerUserId)
     .maybeSingle();
 
   if (projectError) {
@@ -195,7 +217,7 @@ export async function assertOwnedProject({
     .from("academic_projects")
     .select("id")
     .eq("id", projectId)
-    .eq("owner_user_id", ownerUserId)
+    .eq("user_id", ownerUserId)
     .maybeSingle();
 
   if (error) {
