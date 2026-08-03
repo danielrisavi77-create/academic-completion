@@ -12,67 +12,72 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 8 — Authenticated Project Persistence**
+**Epic 9 — First Live Contextual AI Action**
 
 The repository now includes:
 - typed academic project state and events;
 - a versioned, source-backed FPZG rules/policy pack;
 - a public landing page and guest Completion Scan for FPZG Politologija;
 - deterministic project blockers and Next Best Action;
+- Supabase SSR auth + permanent-user ownership of shared `academic_projects.id`;
+- server-owned structured Completion persistence;
+- guest Scan → login → saved project flow;
 - fail-closed runtime AI capability authorization;
 - a provider-agnostic contextual AI execution contract;
-- Supabase SSR authentication using the existing Academic Suite account authority;
-- authenticated ownership of the shared `academic_projects.id`;
-- server-owned structured Completion persistence;
-- guest Scan → login → restored Scan → saved project flow;
-- typed initial project tasks derived from structured Scan answers without persisting thesis text or mentor-message bodies;
-- authenticated `/project/[projectId]` loading backed by persisted project state.
+- the first real provider-backed action, scoped only to persisted `DISCLOSURE_HELP` tasks;
+- deterministic Data Safety blocking before cloud processing;
+- direct Anthropic Messages integration using `claude-sonnet-5`;
+- project/task-scoped content-free usage telemetry and atomic provider-spend reservations;
+- visible generative-AI disclosure before and after the live action.
 
-The canonical Completion database migrations live in the Lekta repository and follow the existing Academic Suite migration history:
+There is still **no generic chat endpoint**. The live HTTP boundary currently rejects every capability except `DISCLOSURE_HELP`, even though the domain engine models additional capabilities for future verified releases.
+
+## Canonical database authority
+
+Completion database migrations live in the Lekta repository and the shared Academic Suite Supabase migration history:
 
 - `0041_completion_app_foundation.sql`
 - `0042_completion_app_access_hardening.sql`
 - `0043_completion_app_permanent_account_gate.sql`
+- `0044_completion_ai_usage.sql`
+- `0045_completion_ai_rate_reservation.sql`
+- `0046_completion_ai_finalize_grant.sql`
 
-There is intentionally **no public/live AI provider endpoint yet**. The next execution layer must pass through permanent-user auth, project ownership, actionable task validation and the runtime policy resolver before any provider call.
-
-## Persistence safety
+## Persistence + AI safety
 
 - `auth.users.id` remains the account authority;
 - `academic_projects.id` remains the shared academic-project authority;
 - shared-core ownership uses `academic_projects.user_id`;
 - Supabase anonymous-auth sessions are not accepted as Completion accounts;
-- authenticated browsers have read-only access to owned Completion state;
-- writes use trusted server credentials only after authenticated ownership validation;
-- the project-creation API accepts only the canonical structured Scan fields and rejects unknown fields;
-- service-role credentials are server-only;
-- no raw thesis text, DOCX body, mentor-message body, AI prompt or model output is persisted by the Completion foundation;
+- browser clients cannot write Completion authority/AI-audit state directly;
+- service-role credentials and `ANTHROPIC_API_KEY` are server-only;
+- live AI request accepts only `taskId + userInput`; browser cannot choose capability/model;
+- official `DENY`, `UNKNOWN`, task mismatch and non-actionable tasks produce zero provider calls;
+- live v0.1 allows only `DISCLOSURE_HELP`;
+- obvious email/phone/OIB-like identifiers, API secrets and bearer tokens are blocked before cloud processing;
+- user input and model output are returned through the request but are not persisted in Completion tables;
+- usage persistence contains project/task/capability/provider/model/token metadata only;
+- provider reservations are atomically limited to 4 per rolling 10 minutes and 12 per rolling 24 hours during the pilot;
 - user-reported Lekta status never becomes `LEKTA_VERIFIED`;
 - stale/mismatched policy rulesets fail closed.
-
-## Policy + AI safety
-
-- official `DENY` cannot be overridden by a user-reported mentor permission;
-- `UNKNOWN` is never treated as `ALLOW`;
-- requested capability must exactly match the project task;
-- only actionable tasks can invoke AI;
-- denied/invalid actions produce zero provider calls;
-- successful audit metadata excludes user input and model output;
-- capability instructions prevent contextual review/coaching from silently becoming submission-text generation.
 
 ## Routes
 
 - `/` — public MTK landing
 - `/scan` — guest Completion Scan + save-to-project handoff
-- `/prijava` — Academic Suite login / registration entry
-- `/project` — demo project-control home until project selection/index is added
-- `/project/[projectId]` — authenticated persisted Project Home
+- `/prijava` — Academic Suite login
+- `/registracija` — account creation
+- `/project` — offline demo Project Home
+- `/project/[projectId]` — authenticated persisted Project Home; shows live disclosure AI only when the project has an actionable `DISCLOSURE_HELP` task
+- `POST /api/projects/[projectId]/ai-actions` — strict task-scoped live AI boundary
+
+## Environment
+
+Copy `.env.example` and configure the shared Academic Suite Supabase values. Live AI additionally requires a server-only `ANTHROPIC_API_KEY`.
 
 ## Canonical product docs
 
-See `docs/product/`.
-
-Epic implementation notes live under `docs/architecture/`.
+See `docs/product/`. Epic implementation notes live under `docs/architecture/`.
 
 ## Development
 
