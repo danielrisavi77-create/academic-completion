@@ -29,7 +29,7 @@ export async function requireAuthenticatedUser() {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.auth.getUser();
 
-  if (error || !data.user) {
+  if (error || !data.user || data.user.is_anonymous) {
     return null;
   }
 
