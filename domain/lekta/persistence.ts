@@ -84,7 +84,7 @@ export function mapLektaProjection({
 export function filterStaleLektaTasks<T extends {
   taskType: string;
   status: string;
-  relatedLektaFindingIds: string[];
+  relatedLektaFindingIds?: string[];
 }>(tasks: T[], lekta: LektaState): T[] {
   const currentFindingIds = new Set(
     lekta.findings
@@ -94,6 +94,6 @@ export function filterStaleLektaTasks<T extends {
 
   return tasks.filter((task) => {
     if (task.taskType !== "LEKTA_FINDING" || task.status === "DONE") return true;
-    return task.relatedLektaFindingIds.some((findingId) => currentFindingIds.has(findingId));
+    return (task.relatedLektaFindingIds ?? []).some((findingId) => currentFindingIds.has(findingId));
   });
 }
