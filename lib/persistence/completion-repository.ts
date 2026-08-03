@@ -198,10 +198,13 @@ export async function getOwnedProject({
     throw new CompletionPersistenceError("Academic project exists without Completion App state.");
   }
 
+  // The Supabase client is intentionally schema-untyped in this repository.
+  // Treat database payloads as unknown at the adapter boundary, then validate
+  // canonical work type/profile/faculty semantics in mapDatabaseProjectToDomain.
   return mapDatabaseProjectToDomain({
-    project: projectData as AcademicProjectRow,
-    state: stateData as CompletionProjectStateRow,
-    tasks: (taskData ?? []) as CompletionTaskRow[],
+    project: projectData as unknown as AcademicProjectRow,
+    state: stateData as unknown as CompletionProjectStateRow,
+    tasks: (taskData ?? []) as unknown as CompletionTaskRow[],
   });
 }
 
