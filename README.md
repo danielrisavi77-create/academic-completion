@@ -12,9 +12,11 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 2 — Typed Project State**
+**Epic 3 — FPZG Rules & AI Policy Pack**
 
-The repository now has a typed domain foundation for project identity, stages, authority, tasks, mentor evidence, Lekta lifecycle, events and a pure state reducer. The production database adapter, Completion Scan, policy resolver, AI execution, Stripe and cross-product integrations remain intentionally deferred.
+The repository now contains typed project state plus a first versioned, source-backed FPZG completion ruleset for 2025/2026. Process and AI-policy rules live here; formal/document rules remain referenced to Lekta as the canonical verification authority.
+
+Runtime policy resolution, Completion Scan, AI execution, Stripe and live cross-product integrations remain intentionally deferred to later Epics.
 
 ## Canonical product docs
 
