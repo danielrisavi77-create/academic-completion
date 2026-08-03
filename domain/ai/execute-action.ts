@@ -1,3 +1,4 @@
+import { assertAIInputDataSafe } from "@/domain/ai/data-safety";
 import { buildAIInstructions } from "@/domain/ai/instructions";
 import type { AIProvider, AIProviderResponse } from "@/domain/ai/provider";
 import type { AICapability } from "@/domain/policy/types";
@@ -91,6 +92,8 @@ export async function executeContextualAIAction({
   }
 
   const normalizedInput = validateInput(userInput);
+  assertAIInputDataSafe(normalizedInput);
+
   const resolution = resolveCapability({ project, capability });
 
   if (!resolution.authorized) {
