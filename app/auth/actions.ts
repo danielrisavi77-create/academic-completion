@@ -3,10 +3,26 @@
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
+const REDIRECT_BASE = "https://academic-completion.invalid";
+
 function safeNext(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return "/";
-  if (!value.startsWith("/") || value.startsWith("//")) return "/";
-  return value;
+  if (
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("\\") ||
+    /[\r\n\0]/.test(value)
+  ) {
+    return "/";
+  }
+
+  try {
+    const parsed = new URL(value, REDIRECT_BASE);
+    if (parsed.origin !== REDIRECT_BASE) return "/";
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return "/";
+  }
 }
 
 function credentials(formData: FormData) {
