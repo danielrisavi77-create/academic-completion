@@ -1,0 +1,61 @@
+name: Patch Epic 10 mentor sent-version adapters
+
+on:
+  push:
+    branches: [agent/epic-10-project-workflow]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/epic-10-project-workflow
+
+      - name: Apply guarded adapter patches
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          patches = {
+            'lib/persistence/completion-repository.ts': [
+              ('  "mentor_last_sent_at",\n  "mentor_last_seen_version_label",',
+               '  "mentor_last_sent_at",\n  "mentor_last_sent_version_label",\n  "mentor_last_seen_version_label",'),
+            ],
+            'app/project/[projectId]/page.tsx': [
+              ('mentorVersionLabel={project.mentor.lastSeenVersionLabel}',
+               'mentorVersionLabel={project.mentor.lastSentVersionLabel ?? null}'),
+            ],
+            'domain/persistence/project-mapper.test.ts': [
+              ('  mentor_last_sent_at: null,\n  mentor_last_seen_version_label: null,',
+               '  mentor_last_sent_at: null,\n  mentor_last_sent_version_label: null,\n  mentor_last_seen_version_label: null,'),
+            ],
+          }
+
+          changed = []
+          for filename, replacements in patches.items():
+            path = Path(filename)
+            text = path.read_text()
+            for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                raise SystemExit(f'{filename}: expected exactly one guarded match, got {count}')
+              text = text.replace(old, new, 1)
+            path.write_text(text)
+            changed.append(filename)
+
+          print('patched', ', '.join(changed))
+          PY
+
+      - name: Commit guarded patch
+        run: |
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/persistence/completion-repository.ts app/project/'[projectId]'/page.tsx domain/persistence/project-mapper.test.ts
+          git commit -m "Keep mentor sent and seen version states separate"
+          git push origin HEAD:agent/epic-10-project-workflow
