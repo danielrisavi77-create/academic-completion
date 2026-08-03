@@ -44,7 +44,7 @@ export default async function PersistentProjectPage({
 
       <div className="page-frame project-ai-frame">
         <ProjectWorkflowControls
-          mentorVersionLabel={project.mentor.lastSeenVersionLabel}
+          mentorVersionLabel={project.mentor.lastSentVersionLabel ?? null}
           mentorWaiting={project.mentor.waitingForMentor}
           projectId={project.id}
           tasks={project.tasks}

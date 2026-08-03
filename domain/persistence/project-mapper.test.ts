@@ -36,6 +36,7 @@ const completionState: CompletionProjectStateRow = {
   deadline_source_id: null,
   deadline_source_label: null,
   mentor_last_sent_at: null,
+  mentor_last_sent_version_label: null,
   mentor_last_seen_version_label: null,
   mentor_waiting_for_response: false,
   topic_approved: true,
