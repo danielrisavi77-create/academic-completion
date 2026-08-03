@@ -31,7 +31,7 @@ export default async function PersistentProjectPage({
   );
 
   return (
-    <AppShell>
+    <AppShell projectId={project.id}>
       <ProjectHome
         project={{
           ...project,
