@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { evaluateCompletionScan } from "@/domain/scan/evaluate-scan";
 import {
@@ -148,7 +149,7 @@ export function CompletionScan() {
   const [actionAcknowledged, setActionAcknowledged] = useState(false);
 
   useEffect(() => {
-    trackClientEvent("scan_started", { faculty: "fpzg" });
+    trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija" });
   }, []);
 
   const progress = useMemo(() => `${step + 1} / 4`, [step]);
@@ -201,6 +202,7 @@ export function CompletionScan() {
     setResult(scanResult);
     trackClientEvent("scan_completed", {
       faculty: "fpzg",
+      program: "politologija",
       workType: form.workType,
       stage: form.stage,
       findings: scanResult.findings.length,
@@ -219,7 +221,7 @@ export function CompletionScan() {
     setStep(0);
     setResult(null);
     setActionAcknowledged(false);
-    trackClientEvent("scan_started", { faculty: "fpzg", restart: true });
+    trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija", restart: true });
   }
 
   if (result) {
@@ -229,7 +231,7 @@ export function CompletionScan() {
           <div>
             <p className="eyebrow">Tvoj Completion Scan</p>
             <h1>{result.workType === "MASTERS_THESIS" ? "Diplomski rad" : "Završni rad"}</h1>
-            <p className="result-subline">FPZG · {result.daysToTarget >= 0 ? `${result.daysToTarget} dana do cilja` : "ciljani datum je prošao"}</p>
+            <p className="result-subline">FPZG · Politologija · {result.daysToTarget >= 0 ? `${result.daysToTarget} dana do cilja` : "ciljani datum je prošao"}</p>
           </div>
           <div className="stage-chip"><span>Faza</span><strong>{stageLabels[result.stage]}</strong></div>
         </div>
@@ -294,7 +296,7 @@ export function CompletionScan() {
 
         <div className="result-actions">
           <button className="secondary-button" onClick={reset} type="button">Ponovi Scan</button>
-          <a className="text-link" href="/project">Pogledaj kako izgleda projektni pregled →</a>
+          <Link className="text-link" href="/project">Pogledaj kako izgleda projektni pregled →</Link>
         </div>
       </div>
     );
@@ -308,7 +310,7 @@ export function CompletionScan() {
         <section className="scan-step">
           <p className="eyebrow">Rad i rok</p>
           <h1>Krenimo od onoga što se ne smije nagađati.</h1>
-          <p className="scan-intro">FPZG je u ovom pilotu jedini podržani fakultet. Ne tražimo tekst rada ni dokument.</p>
+          <p className="scan-intro">Pilot je trenutačno ograničen na FPZG Politologiju. Ne tražimo tekst rada ni dokument.</p>
           <ChoiceGroup
             label="Što pišeš?"
             value={form.workType}
@@ -322,7 +324,6 @@ export function CompletionScan() {
             <label htmlFor="target-date">Koji je tvoj ciljani datum predaje?</label>
             <input
               id="target-date"
-              min="2026-08-03"
               onBlur={() => form.targetSubmissionDate && trackClientEvent("deadline_set", { hasDeadline: true })}
               onChange={(event) => update("targetSubmissionDate", event.target.value)}
               type="date"
@@ -378,7 +379,11 @@ export function CompletionScan() {
       ) : null}
 
       <div className="scan-controls">
-        {step > 0 ? <button className="secondary-button" onClick={back} type="button">Natrag</button> : <a className="secondary-button button-link" href="/">Odustani</a>}
+        {step > 0 ? (
+          <button className="secondary-button" onClick={back} type="button">Natrag</button>
+        ) : (
+          <Link className="secondary-button button-link" href="/">Odustani</Link>
+        )}
         {step < 3 ? (
           <button className="primary-button" disabled={!canContinue(step, form)} onClick={next} type="button">Nastavi</button>
         ) : (
