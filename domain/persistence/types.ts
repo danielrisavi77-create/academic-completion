@@ -5,21 +5,68 @@ import type { TaskPriority, TaskStatus } from "@/domain/tasks/task";
 
 export type DatabaseWorkType = "final" | "graduate";
 
+export type SharedAcademicProjectStage =
+  | "topic"
+  | "research"
+  | "plan"
+  | "writing"
+  | "mentor-review"
+  | "katedra-review"
+  | "lekta-preflight"
+  | "revision"
+  | "submission"
+  | "defense"
+  | "completed";
+
 export function toDatabaseWorkType(workType: WorkType): DatabaseWorkType {
   return workType === "FINAL_THESIS" ? "final" : "graduate";
 }
 
-export function fromDatabaseWorkType(workType: DatabaseWorkType): WorkType {
-  return workType === "final" ? "FINAL_THESIS" : "MASTERS_THESIS";
+export function fromDatabaseWorkType(workType: string): WorkType {
+  if (workType === "final") return "FINAL_THESIS";
+  if (workType === "graduate") return "MASTERS_THESIS";
+  throw new Error(`Unsupported Academic Completion work type: ${workType}`);
+}
+
+export function toSharedAcademicProjectStage(stage: ProjectStage): SharedAcademicProjectStage {
+  switch (stage) {
+    case "TOPIC_ACTIVE":
+      return "topic";
+    case "PLANNING":
+      return "plan";
+    case "RESEARCH":
+      return "research";
+    case "DRAFTING":
+      return "writing";
+    case "REVISION":
+      return "revision";
+    case "MENTOR_REVIEW":
+      return "mentor-review";
+    case "FINAL_CHECK":
+      return "lekta-preflight";
+    case "SUBMISSION":
+      return "submission";
+    case "DEFENSE":
+      return "defense";
+    case "COMPLETED":
+      return "completed";
+  }
 }
 
 export type AcademicProjectRow = {
   id: string;
-  owner_user_id: string;
-  work_type: DatabaseWorkType;
-  profile_id: string;
+  user_id: string;
+  work_type: string;
+  profile_id: string | null;
   title: string | null;
-  status: "active" | "submitted" | "defended" | "archived";
+  topic: string;
+  institution_id: string | null;
+  unit_id: string;
+  program_id: string | null;
+  deadline: string | null;
+  stage: SharedAcademicProjectStage;
+  ruleset_id: string | null;
+  ruleset_version: string | null;
   created_at: string;
   updated_at: string;
 };
