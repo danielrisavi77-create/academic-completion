@@ -1,0 +1,39 @@
+name: Patch Epic 8 React effect
+
+on:
+  push:
+    branches: [agent/epic-8-auth-persistence]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/epic-8-auth-persistence
+
+      - name: Apply guarded effect patch
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('components/scan/CompletionScan.tsx')
+          text = path.read_text()
+          old = '''  useEffect(() => {\n    trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija" });\n\n    const stored = sessionStorage.getItem(scanDraftStorageKey);\n    if (!stored) return;\n\n    try {\n      const restored = parseScanInputPayload(JSON.parse(stored));\n      setForm({\n        workType: restored.workType,\n        targetSubmissionDate: restored.targetSubmissionDate,\n        topicApproved: restored.topicApproved ? "YES" : "NO",\n        stage: restored.stage,\n        draftStatus: restored.draftStatus,\n        mentorVersionStatus: restored.mentorVersionStatus,\n        mentorFeedbackStatus: restored.mentorFeedbackStatus,\n        lektaCheckStatus: restored.lektaCheckStatus,\n        usedAI: restored.usedAI ? "YES" : "NO",\n        mentorAIConsultation: restored.mentorAIConsultation,\n      });\n      setStep(3);\n      setResult(evaluateCompletionScan(restored));\n    } catch {\n      sessionStorage.removeItem(scanDraftStorageKey);\n    }\n  }, []);\n'''
+          new = '''  useEffect(() => {\n    trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija" });\n\n    const stored = sessionStorage.getItem(scanDraftStorageKey);\n    if (!stored) return;\n\n    let cancelled = false;\n    queueMicrotask(() => {\n      if (cancelled) return;\n      try {\n        const restored = parseScanInputPayload(JSON.parse(stored));\n        setForm({\n          workType: restored.workType,\n          targetSubmissionDate: restored.targetSubmissionDate,\n          topicApproved: restored.topicApproved ? "YES" : "NO",\n          stage: restored.stage,\n          draftStatus: restored.draftStatus,\n          mentorVersionStatus: restored.mentorVersionStatus,\n          mentorFeedbackStatus: restored.mentorFeedbackStatus,\n          lektaCheckStatus: restored.lektaCheckStatus,\n          usedAI: restored.usedAI ? "YES" : "NO",\n          mentorAIConsultation: restored.mentorAIConsultation,\n        });\n        setStep(3);\n        setResult(evaluateCompletionScan(restored));\n      } catch {\n        sessionStorage.removeItem(scanDraftStorageKey);\n      }\n    });\n\n    return () => {\n      cancelled = true;\n    };\n  }, []);\n'''
+          if text.count(old) != 1:
+            raise SystemExit(f'Guard failed: expected one effect segment, got {text.count(old)}')
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+      - name: Commit patch
+        run: |
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add components/scan/CompletionScan.tsx
+          git commit -m "Make Scan resume effect React 19 safe"
+          git push origin HEAD:agent/epic-8-auth-persistence
