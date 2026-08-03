@@ -11,11 +11,18 @@ const now = "2026-08-03T12:00:00.000Z";
 
 const academicProject: AcademicProjectRow = {
   id: "project-1",
-  owner_user_id: "user-1",
+  user_id: "user-1",
   work_type: "graduate",
   profile_id: "fpzg-politologija-diplomski",
   title: null,
-  status: "active",
+  topic: "",
+  institution_id: "unizg",
+  unit_id: "fpzg",
+  program_id: null,
+  deadline: "2026-09-01",
+  stage: "revision",
+  ruleset_id: fpzgRuleset.id,
+  ruleset_version: fpzgRuleset.version,
   created_at: now,
   updated_at: now,
 };
@@ -70,14 +77,16 @@ const task: CompletionTaskRow = {
 };
 
 describe("database project mapper", () => {
-  it("maps shared DB work types and reconstructs current FPZG capability decisions from source data", () => {
+  it("maps canonical shared DB work types and reconstructs current FPZG capability decisions", () => {
     const project = mapDatabaseProjectToDomain({
       project: academicProject,
       state: completionState,
       tasks: [task],
     });
 
+    expect(project.ownerUserId).toBe("user-1");
     expect(project.identity.workType).toBe("MASTERS_THESIS");
+    expect(project.identity.facultyId).toBe("fpzg");
     expect(project.policy.capabilityDecisions.GENERATE_SUBMISSION_TEXT).toBe("DENY");
     expect(project.policy.capabilityDecisions.LANGUAGE_REVIEW).toBe("ALLOW_WITH_CONDITIONS");
     expect(project.aiGovernance.mentorConsultation).toBe("USER_REPORTED_CONSULTED");
@@ -112,5 +121,25 @@ describe("database project mapper", () => {
         tasks: [{ ...task, academic_project_id: "project-2" }],
       }),
     ).toThrow(/different academic project/);
+  });
+
+  it("rejects unsupported shared-core work types instead of guessing", () => {
+    expect(() =>
+      mapDatabaseProjectToDomain({
+        project: { ...academicProject, work_type: "seminar" },
+        state: completionState,
+        tasks: [],
+      }),
+    ).toThrow(/Unsupported Academic Completion work type/);
+  });
+
+  it("rejects a profile that does not match the canonical work type", () => {
+    expect(() =>
+      mapDatabaseProjectToDomain({
+        project: { ...academicProject, profile_id: "fpzg-politologija-zavrsni" },
+        state: completionState,
+        tasks: [],
+      }),
+    ).toThrow(/profile is not supported/);
   });
 });
