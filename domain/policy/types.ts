@@ -23,6 +23,19 @@ export const policyDecisions = [
 
 export type PolicyDecision = (typeof policyDecisions)[number];
 
+export const policyConditionCodes = [
+  "VERIFY_SOURCES",
+  "STUDENT_MAINTAINS_INTELLECTUAL_CONTROL",
+  "DISCLOSURE_REQUIRED",
+  "MENTOR_CONSULTATION_REQUIRED",
+  "PERSONAL_DATA_CAUTION",
+  "VERIFY_TRANSLATION",
+  "VERIFY_TRANSCRIPTION",
+  "ACTIVE_STUDENT_PARTICIPATION_REQUIRED",
+] as const;
+
+export type PolicyConditionCode = (typeof policyConditionCodes)[number];
+
 export type PolicyState = {
   rulesetId: string | null;
   rulesetVersion: string | null;
