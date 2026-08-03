@@ -12,11 +12,22 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 3 — FPZG Rules & AI Policy Pack**
+**Epic 4 — Completion Scan**
 
-The repository now contains typed project state plus a first versioned, source-backed FPZG completion ruleset for 2025/2026. Process and AI-policy rules live here; formal/document rules remain referenced to Lekta as the canonical verification authority.
+The repository now includes:
+- typed academic project state;
+- a versioned, source-backed FPZG rules/policy pack;
+- a public MTK landing page;
+- a guest Completion Scan for **FPZG Politologija final/master's work**;
+- a pure scan evaluator that returns at most three findings, a policy snapshot and one initial next action.
 
-Runtime policy resolution, Completion Scan, AI execution, Stripe and live cross-product integrations remain intentionally deferred to later Epics.
+The Scan intentionally requests no thesis text, mentor-comment text or document upload. Persistent project creation, the full blocker/Next Best Action engine, runtime policy authorization, AI execution, Stripe and live Katedra/Lekta integrations remain deferred.
+
+## Routes
+
+- `/` — public MTK landing
+- `/scan` — guest Completion Scan
+- `/project` — project-control shell for the next Epic
 
 ## Canonical product docs
 
