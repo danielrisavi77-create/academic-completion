@@ -93,7 +93,13 @@ export function ProjectWorkflowControls({
     }
   }
 
-  const visibleTasks = tasks.filter((task) => task.status !== "CANCELLED");
+  // Lekta finding tasks are intentionally visible in ProjectHome/Next Best
+  // Action, but they have a separate authority-aware lifecycle panel. Never
+  // render the generic DONE/OPEN controls for them; the DB RPC enforces the
+  // same rule so a modified client cannot bypass this UX boundary.
+  const visibleTasks = tasks.filter(
+    (task) => task.status !== "CANCELLED" && task.taskType !== "LEKTA_FINDING",
+  );
 
   return (
     <section className="project-section workflow-control-section" aria-labelledby="workflow-controls-heading">
