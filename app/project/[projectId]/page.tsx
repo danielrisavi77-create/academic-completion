@@ -1,10 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { DisclosureAIAction } from "@/components/ai/DisclosureAIAction";
+import { LektaWorkflowPanel } from "@/components/lekta/LektaWorkflowPanel";
 import { ProjectHome } from "@/components/project/ProjectHome";
 import { ProjectWorkflowControls } from "@/components/project/ProjectWorkflowControls";
 import { deriveProjectIntelligence } from "@/domain/project/intelligence";
 import { getOwnedProject } from "@/lib/persistence/completion-repository";
+import { hydrateProjectWithLekta } from "@/lib/persistence/lekta-projection-repository";
 import { requireAuthenticatedUser } from "@/lib/supabase/server";
 
 export default async function PersistentProjectPage({
@@ -19,8 +21,9 @@ export default async function PersistentProjectPage({
     redirect(`/prijava?next=${encodeURIComponent(`/project/${projectId}`)}`);
   }
 
-  const project = await getOwnedProject({ ownerUserId: user.id, projectId });
-  if (!project) notFound();
+  const baseProject = await getOwnedProject({ ownerUserId: user.id, projectId });
+  if (!baseProject) notFound();
+  const project = await hydrateProjectWithLekta(baseProject);
 
   const referenceDate = new Date();
   const intelligence = deriveProjectIntelligence(project, referenceDate);
@@ -49,6 +52,10 @@ export default async function PersistentProjectPage({
           projectId={project.id}
           tasks={project.tasks}
         />
+      </div>
+
+      <div className="page-frame project-ai-frame" id="lekta-workflow">
+        <LektaWorkflowPanel projectId={project.id} lekta={project.lekta} />
       </div>
 
       {disclosureTask ? (

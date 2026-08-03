@@ -1,0 +1,89 @@
+.lekta-workflow-card {
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  padding: clamp(1.1rem, 2vw, 1.7rem);
+  box-shadow: 0 18px 50px rgba(22, 28, 35, 0.06);
+}
+
+.lekta-workflow-heading,
+.lekta-workflow-actions,
+.lekta-finding-row,
+.lekta-count-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lekta-workflow-heading h2,
+.lekta-finding-row h3 { margin: 0.2rem 0; }
+.lekta-workflow-heading p,
+.lekta-finding-row p,
+.lekta-workflow-actions span { color: var(--muted); }
+
+.lekta-check-summary {
+  min-width: 140px;
+  text-align: right;
+}
+.lekta-check-summary strong { display: block; font-size: 1.6rem; }
+.lekta-check-summary span { color: var(--muted); font-size: 0.86rem; }
+
+.lekta-count-strip {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.lekta-count-strip span { color: var(--muted); }
+.lekta-count-strip strong { color: var(--text); }
+
+.lekta-finding-list { display: grid; gap: 0.65rem; }
+.lekta-finding-row {
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+}
+.lekta-finding-row p { margin: 0; font-size: 0.9rem; }
+.lekta-severity {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--surface-2);
+}
+.lekta-severity-critical { font-weight: 800; }
+
+.lekta-empty {
+  padding: 1rem;
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.lekta-verified-history { margin-top: 1rem; }
+.lekta-verified-history summary { cursor: pointer; font-weight: 700; }
+.lekta-verified-history li { margin: 0.35rem 0; color: var(--muted); }
+
+.lekta-workflow-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.lekta-workflow-actions div { display: grid; gap: 0.2rem; }
+.lekta-workflow-error { color: #9a1d1d; font-weight: 700; margin-bottom: 0; }
+
+@media (max-width: 720px) {
+  .lekta-workflow-heading,
+  .lekta-workflow-actions,
+  .lekta-finding-row { align-items: stretch; flex-direction: column; }
+  .lekta-check-summary { text-align: left; }
+  .lekta-workflow-actions .primary-button,
+  .lekta-finding-row .secondary-button { width: 100%; }
+}
