@@ -1,6 +1,11 @@
 import type { AuthorityRef } from "@/domain/authority/authority";
 import type { LektaFinding } from "@/domain/lekta/types";
-import type { AICapability, PolicyState } from "@/domain/policy/types";
+import type {
+  AICapability,
+  AIDisclosureState,
+  MentorAIConsultationState,
+  PolicyState,
+} from "@/domain/policy/types";
 import type {
   EvidenceState,
   ProjectIdentity,
@@ -48,6 +53,15 @@ export type ProjectEvent =
       evidence: EvidenceState;
     }>
   | BaseProjectEvent<"POLICY_LOADED", { policy: PolicyState }>
+  | BaseProjectEvent<"AI_MENTOR_CONSULTATION_REPORTED", {
+      state: MentorAIConsultationState;
+    }>
+  | BaseProjectEvent<"AI_DISCLOSURE_STATE_CHANGED", {
+      state: AIDisclosureState;
+    }>
+  | BaseProjectEvent<"AI_DATA_SAFETY_ACKNOWLEDGED", {
+      acknowledged: boolean;
+    }>
   | BaseProjectEvent<"LEKTA_CHECK_IMPORTED", {
       analysisId: string;
       checkedAt: string;

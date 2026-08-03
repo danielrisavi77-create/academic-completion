@@ -23,7 +23,7 @@ function createEvent(): ProjectEvent {
         workType: "MASTERS_THESIS",
         institutionId: "unizg",
         facultyId: "fpzg",
-        profileId: "fpzg-politologija",
+        profileId: "fpzg-politologija-diplomski",
       },
       timeline: {
         targetSubmissionDate: "2026-09-14",
@@ -43,6 +43,54 @@ describe("project reducer", () => {
     expect(project.blockers).toEqual([]);
     expect(project.nextBestAction).toBeNull();
     expect(project).not.toHaveProperty("readinessPercent");
+  });
+
+  it("starts AI governance in a fail-closed state", () => {
+    const project = reduceProjectEvent(null, createEvent());
+
+    expect(project.aiGovernance).toEqual({
+      mentorConsultation: "NOT_ASKED",
+      disclosureState: "NOT_STARTED",
+      dataSafetyAcknowledged: false,
+    });
+  });
+
+  it("updates AI governance through typed events without changing academic stage", () => {
+    let project = reduceProjectEvent(null, createEvent());
+
+    project = reduceProjectEvent(project, {
+      eventId: "event-ai-consultation",
+      projectId,
+      type: "AI_MENTOR_CONSULTATION_REPORTED",
+      occurredAt: "2026-08-03T18:05:00.000Z",
+      authority: userAuthority,
+      payload: { state: "USER_REPORTED_CONSULTED" },
+    });
+
+    project = reduceProjectEvent(project, {
+      eventId: "event-ai-disclosure",
+      projectId,
+      type: "AI_DISCLOSURE_STATE_CHANGED",
+      occurredAt: "2026-08-03T18:06:00.000Z",
+      authority: userAuthority,
+      payload: { state: "USAGE_EVENTS_EXIST" },
+    });
+
+    project = reduceProjectEvent(project, {
+      eventId: "event-ai-safety",
+      projectId,
+      type: "AI_DATA_SAFETY_ACKNOWLEDGED",
+      occurredAt: "2026-08-03T18:07:00.000Z",
+      authority: userAuthority,
+      payload: { acknowledged: true },
+    });
+
+    expect(project.aiGovernance).toEqual({
+      mentorConsultation: "USER_REPORTED_CONSULTED",
+      disclosureState: "USAGE_EVENTS_EXIST",
+      dataSafetyAcknowledged: true,
+    });
+    expect(project.stage).toBe("REVISION");
   });
 
   it("stores mentor approval as user-reported evidence, not external verification", () => {

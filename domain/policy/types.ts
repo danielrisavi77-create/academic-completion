@@ -36,6 +36,25 @@ export const policyConditionCodes = [
 
 export type PolicyConditionCode = (typeof policyConditionCodes)[number];
 
+export type MentorAIConsultationState =
+  | "NOT_ASKED"
+  | "USER_REPORTED_CONSULTED"
+  | "USER_REPORTED_PERMISSION_GIVEN"
+  | "USER_REPORTED_RESTRICTED"
+  | "UNKNOWN";
+
+export type AIDisclosureState =
+  | "NOT_STARTED"
+  | "USAGE_EVENTS_EXIST"
+  | "DRAFT_READY"
+  | "USER_REPORTED_INCLUDED";
+
+export type AIGovernanceState = {
+  mentorConsultation: MentorAIConsultationState;
+  disclosureState: AIDisclosureState;
+  dataSafetyAcknowledged: boolean;
+};
+
 export type PolicyState = {
   rulesetId: string | null;
   rulesetVersion: string | null;
@@ -49,5 +68,13 @@ export function emptyPolicyState(): PolicyState {
     rulesetVersion: null,
     verifiedAt: null,
     capabilityDecisions: {},
+  };
+}
+
+export function emptyAIGovernanceState(): AIGovernanceState {
+  return {
+    mentorConsultation: "NOT_ASKED",
+    disclosureState: "NOT_STARTED",
+    dataSafetyAcknowledged: false,
   };
 }

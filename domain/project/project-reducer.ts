@@ -1,6 +1,6 @@
 import type { ProjectEvent } from "@/domain/events/project-events";
 import { emptyLektaState, summarizeLektaFindings } from "@/domain/lekta/types";
-import { emptyPolicyState } from "@/domain/policy/types";
+import { emptyAIGovernanceState, emptyPolicyState } from "@/domain/policy/types";
 import type { AcademicProject } from "@/domain/project/types";
 
 function requireProject(project: AcademicProject | null, event: ProjectEvent): AcademicProject {
@@ -31,6 +31,7 @@ export function reduceProjectEvent(
       timeline: event.payload.timeline,
       stage: event.payload.stage,
       policy: emptyPolicyState(),
+      aiGovernance: emptyAIGovernanceState(),
       mentor: {
         lastSentAt: null,
         lastSeenVersionLabel: null,
@@ -111,6 +112,36 @@ export function reduceProjectEvent(
 
     case "POLICY_LOADED":
       return { ...current, policy: event.payload.policy, updatedAt };
+
+    case "AI_MENTOR_CONSULTATION_REPORTED":
+      return {
+        ...current,
+        aiGovernance: {
+          ...current.aiGovernance,
+          mentorConsultation: event.payload.state,
+        },
+        updatedAt,
+      };
+
+    case "AI_DISCLOSURE_STATE_CHANGED":
+      return {
+        ...current,
+        aiGovernance: {
+          ...current.aiGovernance,
+          disclosureState: event.payload.state,
+        },
+        updatedAt,
+      };
+
+    case "AI_DATA_SAFETY_ACKNOWLEDGED":
+      return {
+        ...current,
+        aiGovernance: {
+          ...current.aiGovernance,
+          dataSafetyAcknowledged: event.payload.acknowledged,
+        },
+        updatedAt,
+      };
 
     case "LEKTA_CHECK_IMPORTED": {
       const summary = summarizeLektaFindings(event.payload.findings);
