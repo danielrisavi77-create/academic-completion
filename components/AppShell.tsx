@@ -1,10 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { primaryNavigation } from "@/domain/navigation/navigation";
+import { buildPrimaryNavigation } from "@/domain/navigation/navigation";
 
-type AppShellProps = { children: ReactNode };
+type AppShellProps = {
+  children: ReactNode;
+  projectId?: string;
+};
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, projectId }: AppShellProps) {
+  const navigation = buildPrimaryNavigation(projectId);
+
   return (
     <div className="app-shell">
       <aside className="sidebar" aria-label="Glavna navigacija">
@@ -13,7 +18,7 @@ export function AppShell({ children }: AppShellProps) {
           <div><p className="brand-name">Academic Completion</p><p className="brand-kicker">radni naziv</p></div>
         </div>
         <nav className="nav-list">
-          {primaryNavigation.map((item, index) => (
+          {navigation.map((item, index) => (
             <Link className={`nav-item${index === 0 ? " nav-item-active" : ""}`} href={item.href} key={item.id}>
               <span className="nav-dot" aria-hidden="true" />{item.label}
             </Link>
@@ -26,7 +31,7 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
       <main className="main-content">{children}</main>
       <nav className="mobile-nav" aria-label="Glavna navigacija">
-        {primaryNavigation.map((item, index) => (
+        {navigation.map((item, index) => (
           <Link className={`mobile-nav-item${index === 0 ? " mobile-nav-item-active" : ""}`} href={item.href} key={item.id}>
             <span className="mobile-nav-dot" aria-hidden="true" /><span>{item.label}</span>
           </Link>

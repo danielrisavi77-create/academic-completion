@@ -3,6 +3,7 @@ import "./globals.css";
 import "./project-home.css";
 import "./ai-action.css";
 import "./workflow-controls.css";
+import "./project-index.css";
 
 export const metadata: Metadata = {
   title: "Academic Completion",
