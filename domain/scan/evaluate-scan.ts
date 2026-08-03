@@ -132,9 +132,9 @@ function buildFindings(input: ScanInput, daysToTarget: number): ScanFinding[] {
     findings.push(
       finding(
         "AI_POLICY_UNRESOLVED",
-        "CRITICAL",
-        94,
-        "AI uporaba još nije usklađena s mentorom",
+        "HIGH",
+        89,
+        "Konzultacija s mentorom o AI uporabi nije evidentirana",
         "FPZG smjernice za završne i diplomske upućuju studente da se prije uporabe GenAI-ja konzultiraju s mentorom.",
         ["fpzg-ai-language-review", "fpzg-ai-research-discovery"],
       ),
