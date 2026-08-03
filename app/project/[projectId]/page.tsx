@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { DisclosureAIAction } from "@/components/ai/DisclosureAIAction";
 import { ProjectHome } from "@/components/project/ProjectHome";
+import { ProjectWorkflowControls } from "@/components/project/ProjectWorkflowControls";
 import { deriveProjectIntelligence } from "@/domain/project/intelligence";
 import { getOwnedProject } from "@/lib/persistence/completion-repository";
 import { requireAuthenticatedUser } from "@/lib/supabase/server";
@@ -40,6 +41,16 @@ export default async function PersistentProjectPage({
         intelligence={intelligence}
         referenceDate={referenceDate}
       />
+
+      <div className="page-frame project-ai-frame">
+        <ProjectWorkflowControls
+          mentorVersionLabel={project.mentor.lastSeenVersionLabel}
+          mentorWaiting={project.mentor.waitingForMentor}
+          projectId={project.id}
+          tasks={project.tasks}
+        />
+      </div>
+
       {disclosureTask ? (
         <div className="page-frame project-ai-frame">
           <DisclosureAIAction
