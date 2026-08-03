@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { authorityRef } from "@/domain/authority/authority";
 import { emptyLektaState } from "@/domain/lekta/types";
-import { emptyPolicyState } from "@/domain/policy/types";
+import { emptyAIGovernanceState, emptyPolicyState } from "@/domain/policy/types";
 import {
   deriveProjectBlockers,
   deriveProjectIntelligence,
@@ -48,6 +48,7 @@ function project(overrides: Partial<AcademicProject> = {}): AcademicProject {
     },
     stage: "REVISION",
     policy: emptyPolicyState(),
+    aiGovernance: emptyAIGovernanceState(),
     mentor: {
       lastSentAt: null,
       lastSeenVersionLabel: null,
