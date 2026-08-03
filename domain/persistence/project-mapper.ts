@@ -9,6 +9,7 @@ import {
   type CompletionProjectStateRow,
   type CompletionTaskRow,
 } from "@/domain/persistence/types";
+import { profileForWorkType } from "@/domain/scan/types";
 import { toSanitizedTaskTitle } from "@/domain/tasks/task";
 
 function policyFromState(row: CompletionProjectStateRow): PolicyState {
@@ -59,15 +60,32 @@ export function mapDatabaseProjectToDomain({
     }
   }
 
+  const workType = fromDatabaseWorkType(project.work_type);
+  const expectedProfile = profileForWorkType(workType);
+
+  if (project.profile_id !== expectedProfile) {
+    throw new Error("Academic project profile is not supported by this Completion App build.");
+  }
+
+  if (
+    project.institution_id !== fpzgRuleset.institutionId ||
+    project.unit_id !== fpzgRuleset.facultyId
+  ) {
+    throw new Error("Academic project institution/faculty does not match the active FPZG ruleset.");
+  }
+
+  const topic = project.topic.trim() || project.title?.trim() || undefined;
+
   return {
     id: project.id,
-    ownerUserId: project.owner_user_id,
+    ownerUserId: project.user_id,
     identity: {
-      workType: fromDatabaseWorkType(project.work_type),
-      institutionId: "unizg",
-      facultyId: "fpzg",
+      workType,
+      institutionId: project.institution_id,
+      facultyId: project.unit_id,
+      ...(project.program_id ? { programId: project.program_id } : {}),
       profileId: project.profile_id,
-      ...(project.title ? { topic: project.title } : {}),
+      ...(topic ? { topic } : {}),
     },
     timeline: {
       targetSubmissionDate: state.target_submission_date,
