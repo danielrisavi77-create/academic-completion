@@ -12,7 +12,7 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 9 — First Live Contextual AI Action**
+**Epic 11 — Persisted Project Index & Resume**
 
 The repository now includes:
 - typed academic project state and events;
@@ -22,13 +22,15 @@ The repository now includes:
 - Supabase SSR auth + permanent-user ownership of shared `academic_projects.id`;
 - server-owned structured Completion persistence;
 - guest Scan → login → saved project flow;
+- real task-status and mentor workflow controls with atomic audit events;
+- separate user-reported mentor sent-version and mentor-seen state;
 - fail-closed runtime AI capability authorization;
-- a provider-agnostic contextual AI execution contract;
 - the first real provider-backed action, scoped only to persisted `DISCLOSURE_HELP` tasks;
 - deterministic Data Safety blocking before cloud processing;
 - direct Anthropic Messages integration using `claude-sonnet-5`;
 - project/task-scoped content-free usage telemetry and atomic provider-spend reservations;
-- visible generative-AI disclosure before and after the live action.
+- `/project` as a real resume index for signed-in users while guests keep the demo;
+- project-scoped sidebar/mobile navigation on `/project/[projectId]`.
 
 There is still **no generic chat endpoint**. The live HTTP boundary currently rejects every capability except `DISCLOSURE_HELP`, even though the domain engine models additional capabilities for future verified releases.
 
@@ -42,14 +44,25 @@ Completion database migrations live in the Lekta repository and the shared Acade
 - `0044_completion_ai_usage.sql`
 - `0045_completion_ai_rate_reservation.sql`
 - `0046_completion_ai_finalize_grant.sql`
+- `0047_completion_workflow_mutations.sql`
+- `0048_completion_mentor_sent_version.sql`
 
-## Persistence + AI safety
+## Persistence + workflow safety
 
 - `auth.users.id` remains the account authority;
 - `academic_projects.id` remains the shared academic-project authority;
 - shared-core ownership uses `academic_projects.user_id`;
 - Supabase anonymous-auth sessions are not accepted as Completion accounts;
 - browser clients cannot write Completion authority/AI-audit state directly;
+- task and mentor mutations are service-role RPCs after permanent-user auth;
+- task/status changes and workflow audit events are atomic;
+- `mentor_last_sent_version_label` never overwrites `mentor_last_seen_version_label`;
+- mentor-message bodies are never required or persisted;
+- project index queries start from the authenticated user's `academic_projects.user_id` and only then load matching Completion state;
+- unsupported work types/profiles and legacy projects without Completion state are not presented as Completion projects.
+
+## AI safety
+
 - service-role credentials and `ANTHROPIC_API_KEY` are server-only;
 - live AI request accepts only `taskId + userInput`; browser cannot choose capability/model;
 - official `DENY`, `UNKNOWN`, task mismatch and non-actionable tasks produce zero provider calls;
@@ -67,8 +80,10 @@ Completion database migrations live in the Lekta repository and the shared Acade
 - `/scan` — guest Completion Scan + save-to-project handoff
 - `/prijava` — Academic Suite login
 - `/registracija` — account creation
-- `/project` — offline demo Project Home
-- `/project/[projectId]` — authenticated persisted Project Home; shows live disclosure AI only when the project has an actionable `DISCLOSURE_HELP` task
+- `/project` — signed-in project index; guest demo when there is no permanent session
+- `/project/[projectId]` — authenticated persisted Project Home with scoped navigation, workflow controls and contextual disclosure AI when applicable
+- `PATCH /api/projects/[projectId]/tasks/[taskId]` — controlled user task-state mutation
+- `POST /api/projects/[projectId]/mentor-workflow` — content-free mentor workflow mutation
 - `POST /api/projects/[projectId]/ai-actions` — strict task-scoped live AI boundary
 
 ## Environment
