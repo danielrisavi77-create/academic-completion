@@ -1,7 +1,40 @@
 # Academic Completion
 
-Working repository for the third Academic Suite product: a policy-aware academic completion system.
+Working repository for the third Academic Suite product: a **policy-aware academic completion system**.
 
-This repository is intentionally separate from **Katedra** (Croatian academic content/writing assistance) and **Lekta** (deterministic document verification).
+## Product boundaries
 
-Development is specification-first. Product contracts live under `docs/product/` once Epic 1 lands.
+- **Academic Completion:** knows where the academic project stands, what blocks it and what should happen next.
+- **Katedra:** Croatian academic content and writing assistance.
+- **Lekta:** deterministic verification of the actual document.
+
+The central product primitive here is **project state**, not chat.
+
+## Current status
+
+**Epic 1 — App Shell**
+
+The repository intentionally contains only the shell and canonical product documentation. No Stripe, AI execution, document upload, Katedra/Lekta integration or real faculty-policy logic is implemented in this Epic.
+
+## Canonical product docs
+
+See `docs/product/`.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Validation:
+
+```bash
+npm run build
+npm run lint
+npm test
+```
+
+## Epic 1 acceptance target
+
+The shell must make it structurally easier to build a project-control product, not an AI-chat product.

@@ -1,0 +1,18 @@
+{
+  "package": "completion-app-epic0",
+  "version": "0.1.0",
+  "status": "canonical-draft",
+  "working_repo_name": "academic-completion",
+  "launch_institution": "FPZG",
+  "work_types": ["FINAL_THESIS", "MASTERS_THESIS"],
+  "documents": [
+    "00_EPIC_0_INDEX.md",
+    "01_PRODUCT_CONSTITUTION.md",
+    "02_MTK_SPEC.md",
+    "03_TECHNICAL_ARCHITECTURE.md",
+    "04_PROJECT_STATE_SCHEMA.md",
+    "05_AI_POLICY_SCHEMA.md",
+    "06_DATA_BOUNDARY.md",
+    "07_CLAUDE_CODE_CONTRACT.md"
+  ]
+}
