@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./project-home.css";
+import "./ai-action.css";
 
 export const metadata: Metadata = {
   title: "Academic Completion",
