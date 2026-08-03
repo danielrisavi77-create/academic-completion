@@ -9,7 +9,7 @@ export default function ScanPage() {
           <span className="brand-mark" aria-hidden="true">A</span>
           <span>Academic Completion</span>
         </Link>
-        <span className="public-header-note">FPZG pilot · bez registracije</span>
+        <span className="public-header-note">FPZG · Politologija pilot · bez registracije</span>
       </header>
 
       <CompletionScan />
