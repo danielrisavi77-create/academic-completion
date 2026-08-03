@@ -12,13 +12,15 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 1 — App Shell**
+**Epic 2 — Typed Project State**
 
-The repository intentionally contains only the shell and canonical product documentation. No Stripe, AI execution, document upload, Katedra/Lekta integration or real faculty-policy logic is implemented in this Epic.
+The repository now has a typed domain foundation for project identity, stages, authority, tasks, mentor evidence, Lekta lifecycle, events and a pure state reducer. The production database adapter, Completion Scan, policy resolver, AI execution, Stripe and cross-product integrations remain intentionally deferred.
 
 ## Canonical product docs
 
 See `docs/product/`.
+
+Epic implementation notes live under `docs/architecture/`.
 
 ## Development
 
@@ -35,6 +37,4 @@ npm run lint
 npm test
 ```
 
-## Epic 1 acceptance target
-
-The shell must make it structurally easier to build a project-control product, not an AI-chat product.
+CI additionally audits production dependencies at high severity.
