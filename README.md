@@ -13,7 +13,9 @@ The central product primitive here is **project state**, not chat.
 ## Current status
 
 **Epic 12 — Authoritative Lekta Verification Loop: MERGED**  
-**Epic 12.5 — Production E2E Acceptance: HARNESS IMPLEMENTED; LIVE HOSTING/BROWSER GATE PENDING**
+**Epic 12.5 — Production E2E Acceptance: HARNESS IMPLEMENTED; LIVE AUTHORITY/BROWSER GATE PENDING**
+
+Canonical production origin: **https://academic-completion.netlify.app**
 
 The repository now includes:
 - typed academic project state and events;
@@ -41,7 +43,7 @@ The repository now includes:
 
 There is still **no generic chat endpoint**. The live HTTP boundary currently rejects every capability except `DISCLOSURE_HELP`, even though the domain engine models additional capabilities for future verified releases.
 
-The repository does **not** currently record a canonical deployed Academic Completion production origin. Green application CI is therefore not equivalent to production browser acceptance; see `docs/architecture/EPIC_12_5_PRODUCTION_E2E.md`.
+The canonical deployment now exists at `https://academic-completion.netlify.app`. Green application CI is still not equivalent to full production acceptance: `/api/health`, the manual production authority smoke and the private real-FPZG-DOCX browser round-trip must still pass; see `docs/architecture/EPIC_12_5_PRODUCTION_E2E.md`.
 
 ## Canonical database authority
 
@@ -108,7 +110,7 @@ Completion database migrations live in the Lekta repository and the shared Acade
 
 Copy `.env.example` and configure:
 
-- canonical `COMPLETION_APP_URL`;
+- canonical `COMPLETION_APP_URL=https://academic-completion.netlify.app`;
 - shared Academic Suite Supabase public values;
 - server-only `SUPABASE_SERVICE_ROLE_KEY`;
 - optional `LEKTA_APP_URL` override (production default: `https://lektahr.netlify.app`);
@@ -128,7 +130,7 @@ The real production authority smoke is manual only:
 
 ```bash
 PRODUCTION_E2E_CONFIRM=CREATE_AND_DELETE_E2E_DATA \
-COMPLETION_APP_URL=https://your-completion-origin.example \
+COMPLETION_APP_URL=https://academic-completion.netlify.app \
 SUPABASE_URL=https://zrrjttizjyfcxmcpgzml.supabase.co \
 SUPABASE_SERVICE_ROLE_KEY=... \
 npm run production:e2e
