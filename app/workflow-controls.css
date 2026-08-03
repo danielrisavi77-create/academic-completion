@@ -1,0 +1,105 @@
+.workflow-control-section {
+  margin-top: 1.5rem;
+}
+
+.workflow-control-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
+  gap: 1rem;
+}
+
+.workflow-control-grid > div {
+  border: 1px solid var(--line, #d8d8d4);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.workflow-control-grid h3 {
+  margin: 0 0 0.8rem;
+}
+
+.workflow-task-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workflow-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line, #d8d8d4);
+  padding-top: 0.75rem;
+}
+
+.workflow-task:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.workflow-task > div:first-child {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.workflow-task > div:first-child span,
+.workflow-current-state {
+  font-size: 0.78rem;
+  opacity: 0.72;
+}
+
+.workflow-task-actions,
+.workflow-mentor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.workflow-label {
+  display: block;
+  margin: 1rem 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.workflow-input {
+  width: 100%;
+  border: 1px solid var(--line, #d8d8d4);
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  background: var(--surface, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+.workflow-input:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.workflow-mentor-actions {
+  margin-top: 0.8rem;
+}
+
+.workflow-current-state {
+  margin-top: 0.9rem;
+}
+
+.workflow-error {
+  margin-bottom: 1rem;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  font-weight: 650;
+}
+
+@media (max-width: 820px) {
+  .workflow-control-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-task {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
