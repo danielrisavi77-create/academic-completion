@@ -190,25 +190,33 @@ export function CompletionScan() {
     const stored = sessionStorage.getItem(scanDraftStorageKey);
     if (!stored) return;
 
-    try {
-      const restored = parseScanInputPayload(JSON.parse(stored));
-      setForm({
-        workType: restored.workType,
-        targetSubmissionDate: restored.targetSubmissionDate,
-        topicApproved: restored.topicApproved ? "YES" : "NO",
-        stage: restored.stage,
-        draftStatus: restored.draftStatus,
-        mentorVersionStatus: restored.mentorVersionStatus,
-        mentorFeedbackStatus: restored.mentorFeedbackStatus,
-        lektaCheckStatus: restored.lektaCheckStatus,
-        usedAI: restored.usedAI ? "YES" : "NO",
-        mentorAIConsultation: restored.mentorAIConsultation,
-      });
-      setStep(3);
-      setResult(evaluateCompletionScan(restored));
-    } catch {
-      sessionStorage.removeItem(scanDraftStorageKey);
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const restored = parseScanInputPayload(JSON.parse(stored));
+        setForm({
+          workType: restored.workType,
+          targetSubmissionDate: restored.targetSubmissionDate,
+          topicApproved: restored.topicApproved ? "YES" : "NO",
+          stage: restored.stage,
+          draftStatus: restored.draftStatus,
+          mentorVersionStatus: restored.mentorVersionStatus,
+          mentorFeedbackStatus: restored.mentorFeedbackStatus,
+          lektaCheckStatus: restored.lektaCheckStatus,
+          usedAI: restored.usedAI ? "YES" : "NO",
+          mentorAIConsultation: restored.mentorAIConsultation,
+        });
+        setStep(3);
+        setResult(evaluateCompletionScan(restored));
+      } catch {
+        sessionStorage.removeItem(scanDraftStorageKey);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const progress = useMemo(() => `${step + 1} / 4`, [step]);
