@@ -1,0 +1,45 @@
+name: Production E2E Acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type CREATE_AND_DELETE_E2E_DATA to run the self-cleaning production authority test"
+        required: true
+        type: string
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production-e2e
+    env:
+      PRODUCTION_E2E_CONFIRM: ${{ inputs.confirm }}
+      COMPLETION_APP_URL: ${{ vars.COMPLETION_APP_URL }}
+      LEKTA_APP_URL: https://lektahr.netlify.app
+      SUPABASE_URL: https://zrrjttizjyfcxmcpgzml.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Require explicit destructive-test confirmation
+        shell: bash
+        run: |
+          if [ "$PRODUCTION_E2E_CONFIRM" != "CREATE_AND_DELETE_E2E_DATA" ]; then
+            echo "Refusing production E2E without exact confirmation string."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run production authority acceptance
+        run: npm run production:e2e
