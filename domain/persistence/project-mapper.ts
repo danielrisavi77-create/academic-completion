@@ -108,6 +108,7 @@ export function mapDatabaseProjectToDomain({
     },
     mentor: {
       lastSentAt: state.mentor_last_sent_at,
+      lastSentVersionLabel: state.mentor_last_sent_version_label,
       lastSeenVersionLabel: state.mentor_last_seen_version_label,
       waitingForMentor: state.mentor_waiting_for_response,
       topicApproved: evidence(
