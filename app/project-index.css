@@ -1,0 +1,120 @@
+.project-index-page {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.project-index-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 0 0.5rem;
+}
+
+.project-index-hero h1,
+.project-index-empty h2 {
+  margin: 0.15rem 0 0.45rem;
+}
+
+.project-index-hero > div > p:last-child,
+.project-index-empty > p:not(.eyebrow) {
+  max-width: 66ch;
+  line-height: 1.55;
+  opacity: 0.76;
+}
+
+.project-index-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.project-index-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid var(--line, #d8d8d4);
+  border-radius: 16px;
+  padding: 1.15rem 1.2rem;
+  color: inherit;
+  text-decoration: none;
+  background: var(--surface, #fff);
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.project-index-card:hover {
+  transform: translateY(-1px);
+  border-color: currentColor;
+}
+
+.project-index-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-index-card h2 {
+  margin: 0.15rem 0 0;
+  font-size: 1.25rem;
+}
+
+.project-index-open {
+  font-size: 0.82rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.project-index-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  opacity: 0.72;
+}
+
+.project-index-state {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.project-index-status {
+  border: 1px solid var(--line, #d8d8d4);
+  border-radius: 999px;
+  padding: 0.42rem 0.68rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.project-index-status.is-waiting {
+  border-style: dashed;
+}
+
+.project-index-empty {
+  border: 1px solid var(--line, #d8d8d4);
+  border-radius: 16px;
+  padding: 1.5rem;
+  background: var(--surface, #fff);
+}
+
+.project-index-empty .primary-button {
+  display: inline-flex;
+  margin-top: 0.7rem;
+}
+
+@media (max-width: 720px) {
+  .project-index-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-index-card {
+    grid-template-columns: 1fr;
+  }
+
+  .project-index-state {
+    justify-content: flex-start;
+  }
+}
