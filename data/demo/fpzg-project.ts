@@ -46,6 +46,11 @@ export function buildFpzgDemoProject(referenceDate = new Date()): AcademicProjec
     },
     stage: "REVISION",
     policy: fpzgPolicyState(),
+    aiGovernance: {
+      mentorConsultation: "USER_REPORTED_CONSULTED",
+      disclosureState: "USAGE_EVENTS_EXIST",
+      dataSafetyAcknowledged: true,
+    },
     mentor: {
       lastSentAt: addDays(referenceDate, -5),
       lastSeenVersionLabel: "v2",
