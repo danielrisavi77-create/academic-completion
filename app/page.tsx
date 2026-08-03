@@ -13,10 +13,10 @@ export default function LandingPage() {
 
       <section className="landing-hero">
         <div className="landing-hero-copy">
-          <p className="eyebrow">FPZG pilot · završni i diplomski</p>
+          <p className="eyebrow">FPZG · Politologija pilot · završni i diplomski</p>
           <h1>Završi rad bez nagađanja.</h1>
           <p className="landing-lead">
-            Academic Completion prati što još trebaš riješiti, što FPZG traži i koji je sljedeći najsigurniji potez. Katedra radi sa sadržajem, a Lekta provjerava dokument.
+            Academic Completion prati što još trebaš riješiti, što vrijedi za tvoj FPZG projekt i koji je sljedeći najsigurniji potez. Katedra radi sa sadržajem, a Lekta provjerava dokument.
           </p>
           <div className="landing-actions">
             <Link className="primary-button button-link" href="/scan">Provjeri gdje stoji moj rad</Link>
@@ -51,7 +51,7 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-final-cta">
-        <div><p className="eyebrow">3 minute</p><h2>Prvo saznaj što je otvoreno.</h2><p>Za pilot trenutno podržavamo FPZG završne i diplomske radove.</p></div>
+        <div><p className="eyebrow">3 minute</p><h2>Prvo saznaj što je otvoreno.</h2><p>Za pilot trenutno podržavamo FPZG Politologiju — završne i diplomske radove.</p></div>
         <Link className="primary-button button-link" href="/scan">Pokreni Completion Scan</Link>
       </section>
     </main>
