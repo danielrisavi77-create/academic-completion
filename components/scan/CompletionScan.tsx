@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { SaveProjectButton, scanDraftStorageKey } from "@/components/scan/SaveProjectButton";
 import { evaluateCompletionScan } from "@/domain/scan/evaluate-scan";
+import { parseScanInputPayload } from "@/domain/scan/parse-input";
 import {
   profileForWorkType,
   type DraftStatus,
@@ -10,6 +12,7 @@ import {
   type MentorAIConsultationStatus,
   type MentorFeedbackStatus,
   type MentorVersionStatus,
+  type ScanInput,
   type ScanResult,
   type ScanStage,
 } from "@/domain/scan/types";
@@ -142,6 +145,39 @@ function policySymbol(decision: ScanResult["policySnapshot"]["items"][number]["d
   return "?";
 }
 
+function scanInputFromForm(form: FormState): ScanInput | null {
+  if (
+    !form.workType ||
+    !form.targetSubmissionDate ||
+    !form.topicApproved ||
+    !form.stage ||
+    !form.draftStatus ||
+    !form.mentorVersionStatus ||
+    !form.mentorFeedbackStatus ||
+    !form.lektaCheckStatus ||
+    !form.usedAI
+  ) {
+    return null;
+  }
+
+  return {
+    workType: form.workType,
+    profileId: profileForWorkType(form.workType),
+    targetSubmissionDate: form.targetSubmissionDate,
+    topicApproved: form.topicApproved === "YES",
+    stage: form.stage,
+    draftStatus: form.draftStatus,
+    mentorVersionStatus: form.mentorVersionStatus,
+    mentorFeedbackStatus: form.mentorFeedbackStatus,
+    lektaCheckStatus: form.lektaCheckStatus,
+    usedAI: form.usedAI === "YES",
+    mentorAIConsultation:
+      form.usedAI === "YES" && form.mentorAIConsultation
+        ? form.mentorAIConsultation
+        : "UNKNOWN",
+  };
+}
+
 export function CompletionScan() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [step, setStep] = useState(0);
@@ -150,6 +186,37 @@ export function CompletionScan() {
 
   useEffect(() => {
     trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija" });
+
+    const stored = sessionStorage.getItem(scanDraftStorageKey);
+    if (!stored) return;
+
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const restored = parseScanInputPayload(JSON.parse(stored));
+        setForm({
+          workType: restored.workType,
+          targetSubmissionDate: restored.targetSubmissionDate,
+          topicApproved: restored.topicApproved ? "YES" : "NO",
+          stage: restored.stage,
+          draftStatus: restored.draftStatus,
+          mentorVersionStatus: restored.mentorVersionStatus,
+          mentorFeedbackStatus: restored.mentorFeedbackStatus,
+          lektaCheckStatus: restored.lektaCheckStatus,
+          usedAI: restored.usedAI ? "YES" : "NO",
+          mentorAIConsultation: restored.mentorAIConsultation,
+        });
+        setStep(3);
+        setResult(evaluateCompletionScan(restored));
+      } catch {
+        sessionStorage.removeItem(scanDraftStorageKey);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const progress = useMemo(() => `${step + 1} / 4`, [step]);
@@ -169,35 +236,10 @@ export function CompletionScan() {
 
   function submit() {
     if (!canContinue(3, form)) return;
-    if (
-      !form.workType ||
-      !form.targetSubmissionDate ||
-      !form.stage ||
-      !form.draftStatus ||
-      !form.mentorVersionStatus ||
-      !form.mentorFeedbackStatus ||
-      !form.lektaCheckStatus ||
-      !form.usedAI
-    ) {
-      return;
-    }
+    const scanInput = scanInputFromForm(form);
+    if (!scanInput) return;
 
-    const scanResult = evaluateCompletionScan({
-      workType: form.workType,
-      profileId: profileForWorkType(form.workType),
-      targetSubmissionDate: form.targetSubmissionDate,
-      topicApproved: form.topicApproved === "YES",
-      stage: form.stage,
-      draftStatus: form.draftStatus,
-      mentorVersionStatus: form.mentorVersionStatus,
-      mentorFeedbackStatus: form.mentorFeedbackStatus,
-      lektaCheckStatus: form.lektaCheckStatus,
-      usedAI: form.usedAI === "YES",
-      mentorAIConsultation:
-        form.usedAI === "YES" && form.mentorAIConsultation
-          ? form.mentorAIConsultation
-          : "UNKNOWN",
-    });
+    const scanResult = evaluateCompletionScan(scanInput);
 
     setResult(scanResult);
     trackClientEvent("scan_completed", {
@@ -221,10 +263,13 @@ export function CompletionScan() {
     setStep(0);
     setResult(null);
     setActionAcknowledged(false);
+    sessionStorage.removeItem(scanDraftStorageKey);
     trackClientEvent("scan_started", { faculty: "fpzg", program: "politologija", restart: true });
   }
 
   if (result) {
+    const completedScanInput = scanInputFromForm(form);
+
     return (
       <div className="scan-result" aria-live="polite">
         <div className="result-hero">
@@ -293,6 +338,19 @@ export function CompletionScan() {
           </div>
           <p className="source-note">Ruleset provjeren {result.policySnapshot.verifiedAt}. Konačnu akademsku odluku donose mentor i Fakultet.</p>
         </section>
+
+        {completedScanInput ? (
+          <section className="result-section" aria-labelledby="save-project-heading">
+            <div className="section-heading-row">
+              <div>
+                <p className="eyebrow">Nastavi bez ponovnog unosa</p>
+                <h2 id="save-project-heading">Pretvori ovaj Scan u svoj projekt</h2>
+                <p>Besplatni rezultat ostaje tvoj. Račun trebaš samo ako želiš spremiti stanje, blockere i sljedeće korake.</p>
+              </div>
+            </div>
+            <SaveProjectButton scanInput={completedScanInput} />
+          </section>
+        ) : null}
 
         <div className="result-actions">
           <button className="secondary-button" onClick={reset} type="button">Ponovi Scan</button>
