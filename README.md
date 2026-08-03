@@ -12,18 +12,25 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 5 — Project Home, Blockers & Next Best Action**
+**Epic 6 — Runtime Policy Resolver**
 
 The repository now includes:
 - typed academic project state and events;
 - a versioned, source-backed FPZG rules/policy pack;
 - a public landing page and guest Completion Scan for FPZG Politologija;
-- deterministic project blocker derivation;
-- a separate waiting-external signal;
-- deterministic Next Best Action selection;
-- a real `/project` home powered by typed state and a clearly labelled demo project.
+- deterministic project blockers and Next Best Action;
+- a typed `/project` home (`DEMO STATE` until persistence arrives);
+- fail-closed runtime AI capability authorization using exact project ruleset version and structured AI-governance state.
 
-The Project Home does not yet pretend the Scan is persisted. Auth, Supabase persistence, runtime policy authorization, AI execution, Stripe and live Katedra/Lekta network integrations remain intentionally deferred.
+The resolver does not call an AI provider. Actual model execution, auth/Supabase persistence, Stripe and live Katedra/Lekta network integrations remain intentionally deferred.
+
+## Policy safety
+
+- official `DENY` cannot be overridden by a user-reported mentor permission;
+- `UNKNOWN` is never treated as `ALLOW`;
+- stale/mismatched project rulesets fail closed;
+- conditional capabilities remain blocked until runtime blocking conditions are met;
+- source verification, disclosure and student-control requirements remain visible obligations after authorization.
 
 ## Routes
 
