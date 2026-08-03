@@ -38,6 +38,7 @@ const STATE_SELECT = [
   "deadline_source_id",
   "deadline_source_label",
   "mentor_last_sent_at",
+  "mentor_last_sent_version_label",
   "mentor_last_seen_version_label",
   "mentor_waiting_for_response",
   "topic_approved",
