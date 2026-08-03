@@ -23,6 +23,10 @@ class RecordingProvider implements AIProvider {
       text: "provider-output-marker",
       providerId: "fake-provider",
       modelId: "fake-model",
+      usage: {
+        inputTokens: 111,
+        outputTokens: 22,
+      },
     };
   }
 }
@@ -223,5 +227,23 @@ describe("contextual AI execution contract", () => {
     });
 
     expect(provider.calls[0]?.userInput).toBe("moj odgovor");
+  });
+
+  it("blocks obvious personal identifiers before any provider call", async () => {
+    const provider = new RecordingProvider();
+    const project = buildFpzgDemoProject(now);
+    const task = project.tasks[0]!;
+
+    await expect(
+      executeContextualAIAction({
+        project,
+        taskId: task.id,
+        capability: task.capability!,
+        userInput: "Moj kontakt je student@example.com.",
+        provider,
+      }),
+    ).rejects.toThrow(/cloud processing/i);
+
+    expect(provider.calls).toHaveLength(0);
   });
 });

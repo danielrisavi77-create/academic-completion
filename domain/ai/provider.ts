@@ -8,10 +8,16 @@ export type AIProviderRequest = {
   systemInstructions: string[];
 };
 
+export type AIProviderUsage = {
+  inputTokens: number;
+  outputTokens: number;
+};
+
 export type AIProviderResponse = {
   text: string;
   providerId: string;
   modelId: string;
+  usage: AIProviderUsage;
 };
 
 export interface AIProvider {
