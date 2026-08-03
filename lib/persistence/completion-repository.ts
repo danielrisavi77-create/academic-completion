@@ -123,6 +123,7 @@ export async function createOwnedProjectFromScan({
     stage: command.stage,
     target_submission_date: command.targetSubmissionDate,
     deadline_authority_type: "USER_REPORTED",
+    mentor_waiting_for_response: command.mentorWaitingForResponse,
     topic_approved: command.topicApproved,
     topic_approval_authority_type: "USER_REPORTED",
     ai_policy_ruleset_id: command.aiPolicyRulesetId,
@@ -138,15 +139,60 @@ export async function createOwnedProjectFromScan({
     throw new CompletionPersistenceError(`Could not create completion state: ${stateError.message}`);
   }
 
-  const { error: eventError } = await admin.from("completion_events").insert({
-    academic_project_id: projectId,
-    event_type: "PROJECT_CREATED",
-    authority_type: "USER_REPORTED",
+  const initialTaskRows = command.initialTasks.map((draft) => {
+    const systemAssessed = draft.authorityType === "SYSTEM_ASSESSED";
+    return {
+      id: randomUUID(),
+      academic_project_id: projectId,
+      task_type: draft.taskType,
+      title: draft.title,
+      status: "OPEN",
+      priority: draft.priority,
+      stage: command.stage,
+      authority_type: draft.authorityType,
+      authority_source_label: systemAssessed
+        ? "Completion Scan + aktualni FPZG ruleset"
+        : "Strukturirani odgovor u Completion Scanu",
+      capability: draft.capability ?? null,
+      related_rule_ids: draft.relatedRuleIds,
+      related_lekta_finding_ids: [],
+    };
   });
+
+  if (initialTaskRows.length > 0) {
+    const { error: taskError } = await admin.from("completion_tasks").insert(initialTaskRows);
+    if (taskError) {
+      await removePartialProject(projectId);
+      throw new CompletionPersistenceError(`Could not create initial completion tasks: ${taskError.message}`);
+    }
+  }
+
+  const eventRows = [
+    {
+      academic_project_id: projectId,
+      task_id: null,
+      event_type: "PROJECT_CREATED",
+      capability: null,
+      policy_rule_ids: [],
+      authority_type: "USER_REPORTED",
+      authority_source_label: "Structured Completion Scan",
+    },
+    ...initialTaskRows.map((taskRow) => ({
+      academic_project_id: projectId,
+      task_id: taskRow.id,
+      event_type: "TASK_CREATED",
+      capability: taskRow.capability,
+      policy_rule_ids: taskRow.related_rule_ids,
+      authority_type: taskRow.authority_type,
+      authority_source_label: taskRow.authority_source_label,
+    })),
+  ];
+
+  const { error: eventError } = await admin.from("completion_events").insert(eventRows);
 
   if (eventError) {
     await removePartialProject(projectId);
-    throw new CompletionPersistenceError(`Could not create project audit event: ${eventError.message}`);
+    throw new CompletionPersistenceError(`Could not create project audit events: ${eventError.message}`);
   }
 
   return projectId;
