@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { DisclosureAIAction } from "@/components/ai/DisclosureAIAction";
 import { ProjectHome } from "@/components/project/ProjectHome";
 import { deriveProjectIntelligence } from "@/domain/project/intelligence";
 import { getOwnedProject } from "@/lib/persistence/completion-repository";
@@ -22,6 +23,11 @@ export default async function PersistentProjectPage({
 
   const referenceDate = new Date();
   const intelligence = deriveProjectIntelligence(project, referenceDate);
+  const disclosureTask = project.tasks.find(
+    (task) =>
+      task.capability === "DISCLOSURE_HELP" &&
+      (task.status === "OPEN" || task.status === "IN_PROGRESS"),
+  );
 
   return (
     <AppShell>
@@ -34,6 +40,15 @@ export default async function PersistentProjectPage({
         intelligence={intelligence}
         referenceDate={referenceDate}
       />
+      {disclosureTask ? (
+        <div className="page-frame project-ai-frame">
+          <DisclosureAIAction
+            projectId={project.id}
+            taskId={disclosureTask.id}
+            taskTitle={disclosureTask.title}
+          />
+        </div>
+      ) : null}
     </AppShell>
   );
 }
