@@ -12,22 +12,24 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 4 — Completion Scan**
+**Epic 5 — Project Home, Blockers & Next Best Action**
 
 The repository now includes:
-- typed academic project state;
+- typed academic project state and events;
 - a versioned, source-backed FPZG rules/policy pack;
-- a public MTK landing page;
-- a guest Completion Scan for **FPZG Politologija final/master's work**;
-- a pure scan evaluator that returns at most three findings, a policy snapshot and one initial next action.
+- a public landing page and guest Completion Scan for FPZG Politologija;
+- deterministic project blocker derivation;
+- a separate waiting-external signal;
+- deterministic Next Best Action selection;
+- a real `/project` home powered by typed state and a clearly labelled demo project.
 
-The Scan intentionally requests no thesis text, mentor-comment text or document upload. Persistent project creation, the full blocker/Next Best Action engine, runtime policy authorization, AI execution, Stripe and live Katedra/Lekta integrations remain deferred.
+The Project Home does not yet pretend the Scan is persisted. Auth, Supabase persistence, runtime policy authorization, AI execution, Stripe and live Katedra/Lekta network integrations remain intentionally deferred.
 
 ## Routes
 
 - `/` — public MTK landing
 - `/scan` — guest Completion Scan
-- `/project` — project-control shell for the next Epic
+- `/project` — typed project-control home (`DEMO STATE` until persistence arrives)
 
 ## Canonical product docs
 
