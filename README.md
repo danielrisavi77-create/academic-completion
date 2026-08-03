@@ -12,7 +12,8 @@ The central product primitive here is **project state**, not chat.
 
 ## Current status
 
-**Epic 11 — Persisted Project Index & Resume**
+**Epic 12 — Authoritative Lekta Verification Loop: MERGED**  
+**Epic 12.5 — Production E2E Acceptance: HARNESS IMPLEMENTED; LIVE HOSTING/BROWSER GATE PENDING**
 
 The repository now includes:
 - typed academic project state and events;
@@ -30,9 +31,17 @@ The repository now includes:
 - direct Anthropic Messages integration using `claude-sonnet-5`;
 - project/task-scoped content-free usage telemetry and atomic provider-spend reservations;
 - `/project` as a real resume index for signed-in users while guests keep the demo;
-- project-scoped sidebar/mobile navigation on `/project/[projectId]`.
+- project-scoped sidebar/mobile navigation on `/project/[projectId]`;
+- real hydration of the latest `lekta_checks` + structured `completion_lekta_findings` lifecycle;
+- `OPEN → USER_CHANGED → RECHECK_REQUIRED → VERIFIED_FIXED`, with only Lekta allowed to produce the final verification state;
+- server-minted project-bound handoff capabilities whose raw token stays in the URL fragment and whose DB form is SHA-256 only;
+- DB enforcement that generic task controls cannot mutate `LEKTA_FINDING` task authority;
+- a content-free `/api/health` production readiness contract;
+- a manually triggered, self-cleaning production authority E2E smoke.
 
 There is still **no generic chat endpoint**. The live HTTP boundary currently rejects every capability except `DISCLOSURE_HELP`, even though the domain engine models additional capabilities for future verified releases.
+
+The repository does **not** currently record a canonical deployed Academic Completion production origin. Green application CI is therefore not equivalent to production browser acceptance; see `docs/architecture/EPIC_12_5_PRODUCTION_E2E.md`.
 
 ## Canonical database authority
 
@@ -46,6 +55,9 @@ Completion database migrations live in the Lekta repository and the shared Acade
 - `0046_completion_ai_finalize_grant.sql`
 - `0047_completion_workflow_mutations.sql`
 - `0048_completion_mentor_sent_version.sql`
+- `0049_completion_lekta_handoff_lifecycle.sql`
+- `0050_completion_lekta_handoff_token_rotation.sql`
+- `0051_completion_lekta_task_authority_guard.sql`
 
 ## Persistence + workflow safety
 
@@ -58,7 +70,10 @@ Completion database migrations live in the Lekta repository and the shared Acade
 - task/status changes and workflow audit events are atomic;
 - `mentor_last_sent_version_label` never overwrites `mentor_last_seen_version_label`;
 - mentor-message bodies are never required or persisted;
-- project index queries start from the authenticated user's `academic_projects.user_id` and only then load matching Completion state;
+- Completion does not ingest raw DOCX/body text for Lekta verification;
+- current Lekta workflow UI reads only the structured finding projection and latest check metadata;
+- a user may report that a document was changed, but only a later Lekta check can create `VERIFIED_FIXED`;
+- `LEKTA_FINDING` tasks cannot be manually closed/reopened through the generic task RPC;
 - unsupported work types/profiles and legacy projects without Completion state are not presented as Completion projects.
 
 ## AI safety
@@ -81,14 +96,45 @@ Completion database migrations live in the Lekta repository and the shared Acade
 - `/prijava` — Academic Suite login
 - `/registracija` — account creation
 - `/project` — signed-in project index; guest demo when there is no permanent session
-- `/project/[projectId]` — authenticated persisted Project Home with scoped navigation, workflow controls and contextual disclosure AI when applicable
-- `PATCH /api/projects/[projectId]/tasks/[taskId]` — controlled user task-state mutation
+- `/project/[projectId]` — authenticated persisted Project Home with scoped navigation, workflow controls, Lekta lifecycle and contextual disclosure AI when applicable
+- `/api/health` — content-free production readiness contract; HTTP 503 until core production authority is configured
+- `PATCH /api/projects/[projectId]/tasks/[taskId]` — controlled generic user task-state mutation (Lekta tasks are rejected by DB authority)
 - `POST /api/projects/[projectId]/mentor-workflow` — content-free mentor workflow mutation
 - `POST /api/projects/[projectId]/ai-actions` — strict task-scoped live AI boundary
+- `POST /api/projects/[projectId]/lekta-handoff` — server-minted Lekta handoff capability
+- `POST /api/projects/[projectId]/lekta-findings/[issueKey]` — controlled `USER_CHANGED` finding mutation
 
 ## Environment
 
-Copy `.env.example` and configure the shared Academic Suite Supabase values. Live AI additionally requires a server-only `ANTHROPIC_API_KEY`.
+Copy `.env.example` and configure:
+
+- canonical `COMPLETION_APP_URL`;
+- shared Academic Suite Supabase public values;
+- server-only `SUPABASE_SERVICE_ROLE_KEY`;
+- optional `LEKTA_APP_URL` override (production default: `https://lektahr.netlify.app`);
+- server-only `ANTHROPIC_API_KEY` for live contextual AI.
+
+Never set `PRODUCTION_E2E_CONFIRM` permanently in the deployed app.
+
+## Production acceptance
+
+Normal validation never mutates production data.
+
+```bash
+npm run check:production-e2e
+```
+
+The real production authority smoke is manual only:
+
+```bash
+PRODUCTION_E2E_CONFIRM=CREATE_AND_DELETE_E2E_DATA \
+COMPLETION_APP_URL=https://your-completion-origin.example \
+SUPABASE_URL=https://zrrjttizjyfcxmcpgzml.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=... \
+npm run production:e2e
+```
+
+Prefer the manually triggered GitHub workflow `Production E2E Acceptance`, which uses the protected `production-e2e` environment. Full browser + private real-FPZG-DOCX acceptance remains a separate required gate; see the Epic 12.5 architecture note.
 
 ## Canonical product docs
 
@@ -104,9 +150,10 @@ npm run dev
 Validation:
 
 ```bash
+npm run check:production-e2e
 npm run build
 npm run lint
 npm test
 ```
 
-CI uses the committed npm lockfile, runs production dependency audit at high severity, then tests, lint and Next production build.
+CI uses the committed npm lockfile, runs production dependency audit at high severity, validates the production E2E harness syntax, then tests, lint and Next production build.
