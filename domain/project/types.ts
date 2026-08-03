@@ -2,7 +2,7 @@ import type { AuthorityRef } from "@/domain/authority/authority";
 import type { ProjectBlocker } from "@/domain/blockers/types";
 import type { LektaState } from "@/domain/lekta/types";
 import type { NextBestAction } from "@/domain/next-action/types";
-import type { PolicyState } from "@/domain/policy/types";
+import type { AIGovernanceState, PolicyState } from "@/domain/policy/types";
 import type { ProjectTask } from "@/domain/tasks/task";
 
 export type WorkType = "FINAL_THESIS" | "MASTERS_THESIS";
@@ -64,6 +64,7 @@ export type AcademicProject = {
   timeline: ProjectTimeline;
   stage: ProjectStage;
   policy: PolicyState;
+  aiGovernance: AIGovernanceState;
   mentor: MentorState;
   lekta: LektaState;
   tasks: ProjectTask[];
