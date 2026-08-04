@@ -17,6 +17,7 @@ function normalizedHttpOrigin(value: string | undefined) {
 
 function buildRevision(env: NodeJS.ProcessEnv) {
   return (
+    env.ACADEMIC_COMPLETION_BUILD_REVISION?.trim() ||
     env.COMMIT_REF?.trim() ||
     env.VERCEL_GIT_COMMIT_SHA?.trim() ||
     env.GITHUB_SHA?.trim() ||
