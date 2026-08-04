@@ -8,7 +8,20 @@ export default function LandingPage() {
           <span className="brand-mark" aria-hidden="true">A</span>
           <span>Academic Completion</span>
         </Link>
-        <Link className="header-link" href="/project">Projektni pregled</Link>
+        <nav
+          aria-label="Račun i projekt"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <Link className="header-link" href="/project">Projektni pregled</Link>
+          <Link className="header-link" href="/prijava">Prijavi se</Link>
+          <Link className="primary-button button-link" href="/registracija">Registriraj se</Link>
+        </nav>
       </header>
 
       <section className="landing-hero">
