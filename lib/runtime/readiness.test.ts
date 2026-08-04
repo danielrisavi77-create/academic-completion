@@ -28,7 +28,7 @@ describe("production readiness", () => {
       LEKTA_APP_URL: "https://lektahr.netlify.app/analyzer",
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "publishable",
-      SUPABASE_SECRET_KEY: "sb_secret_test",
+      SUPABASE_SECRET_KEY: "test-service-credential",
       COMMIT_REF: "abc123",
     });
 
@@ -59,7 +59,7 @@ describe("production readiness", () => {
       LEKTA_APP_URL: "file:///tmp/lekta",
       NEXT_PUBLIC_SUPABASE_URL: "not a url",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
-      SUPABASE_SECRET_KEY: "sb_secret_test",
+      SUPABASE_SECRET_KEY: "test-service-credential",
     });
 
     expect(readiness.checks).toEqual({
