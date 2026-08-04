@@ -18,7 +18,9 @@ jobs:
       COMPLETION_APP_URL: ${{ vars.COMPLETION_APP_URL }}
       LEKTA_APP_URL: https://lektahr.netlify.app
       SUPABASE_URL: https://zrrjttizjyfcxmcpgzml.supabase.co
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # Canonical 2026 server credential. The harness still reads its legacy
+      # internal env name for backward compatibility.
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 
     steps:
       - name: Require explicit destructive-test confirmation
