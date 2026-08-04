@@ -34,7 +34,7 @@ export function productionReadiness(env: NodeJS.ProcessEnv = process.env) {
       env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
   );
   const serviceCredentialConfigured = Boolean(
-    env.SUPABASE_SECRET_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+    env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
   );
 
   const checks = {
