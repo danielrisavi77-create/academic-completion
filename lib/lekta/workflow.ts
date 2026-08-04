@@ -1,5 +1,5 @@
 import type { AcademicProject } from "@/domain/project/types";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   buildLektaHandoffUrl,
   mintLektaHandoffCapability,
@@ -12,6 +12,17 @@ export class LektaWorkflowError extends Error {
   }
 }
 
+async function authenticatedWorkflowClient(expectedUserId: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user || data.user.is_anonymous || data.user.id !== expectedUserId) {
+    throw new LektaWorkflowError("Authenticated Lekta workflow user mismatch.");
+  }
+
+  return supabase;
+}
+
 export async function prepareOwnedLektaHandoff({
   userId,
   project,
@@ -21,10 +32,13 @@ export async function prepareOwnedLektaHandoff({
   project: AcademicProject;
   recheck: boolean;
 }) {
+  if (project.ownerUserId !== userId) {
+    throw new LektaWorkflowError("Lekta handoff project ownership mismatch.");
+  }
+
   const capability = mintLektaHandoffCapability();
-  const admin = createAdminSupabaseClient();
-  const { data, error } = await admin.rpc("completion_prepare_lekta_handoff", {
-    p_user: userId,
+  const supabase = await authenticatedWorkflowClient(userId);
+  const { data, error } = await supabase.rpc("completion_prepare_lekta_handoff_user", {
     p_project: project.id,
     p_token_hash: capability.tokenHash,
     p_expires_at: capability.expiresAt,
@@ -51,9 +65,8 @@ export async function markOwnedLektaFindingChanged({
   projectId: string;
   issueKey: string;
 }) {
-  const admin = createAdminSupabaseClient();
-  const { data, error } = await admin.rpc("completion_mark_lekta_finding_changed", {
-    p_user: userId,
+  const supabase = await authenticatedWorkflowClient(userId);
+  const { data, error } = await supabase.rpc("completion_mark_lekta_finding_changed_user", {
     p_project: projectId,
     p_issue_key: issueKey,
   });
