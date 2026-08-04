@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { getSupabaseServiceEnv } from "@/lib/supabase/env";
+import { getSupabaseServiceEnv } from "@/lib/supabase/service-env";
 
 export function createAdminSupabaseClient() {
   const { url, serviceRoleKey } = getSupabaseServiceEnv();
