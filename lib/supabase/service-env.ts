@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getSupabasePublicEnv } from "@/lib/supabase/env";
 
 const SUPABASE_SERVICE_ENV_KEYS = [
@@ -14,12 +16,6 @@ export function getConfiguredSupabaseServiceKey(
   }
 
   return null;
-}
-
-export function hasSupabaseServiceCredential(
-  env: NodeJS.ProcessEnv = process.env,
-) {
-  return Boolean(getConfiguredSupabaseServiceKey(env));
 }
 
 export function getSupabaseServiceEnv() {
