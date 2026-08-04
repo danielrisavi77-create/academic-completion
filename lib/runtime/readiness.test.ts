@@ -22,13 +22,13 @@ describe("production readiness", () => {
     expect(readiness.readyForLektaHandoff).toBe(false);
   });
 
-  it("reports ready with the canonical Supabase secret key", () => {
+  it("reports ready with the deployable legacy service-role credential", () => {
     const readiness = productionReadiness({
       COMPLETION_APP_URL: "https://completion.example/ignored/path",
       LEKTA_APP_URL: "https://lektahr.netlify.app/analyzer",
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "publishable",
-      SUPABASE_SECRET_KEY: "sb_secret_test",
+      SUPABASE_SERVICE_ROLE_KEY: "server-only",
       COMMIT_REF: "abc123",
     });
 
@@ -41,16 +41,16 @@ describe("production readiness", () => {
     });
   });
 
-  it("keeps the legacy service-role key as a migration fallback", () => {
+  it("does not treat the modern server secret name as production authority", () => {
     const readiness = productionReadiness({
       COMPLETION_APP_URL: "https://completion.example",
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
-      SUPABASE_SERVICE_ROLE_KEY: "legacy-service-role",
+      SUPABASE_SECRET_KEY: "not-used-by-this-runtime",
     });
 
-    expect(readiness.checks.supabaseServiceConfigured).toBe(true);
-    expect(readiness.readyForLektaHandoff).toBe(true);
+    expect(readiness.checks.supabaseServiceConfigured).toBe(false);
+    expect(readiness.readyForLektaHandoff).toBe(false);
   });
 
   it("rejects non-http origins instead of treating them as configured", () => {
@@ -59,7 +59,7 @@ describe("production readiness", () => {
       LEKTA_APP_URL: "file:///tmp/lekta",
       NEXT_PUBLIC_SUPABASE_URL: "not a url",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon",
-      SUPABASE_SECRET_KEY: "sb_secret_test",
+      SUPABASE_SERVICE_ROLE_KEY: "server-only",
     });
 
     expect(readiness.checks).toEqual({
