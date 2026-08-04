@@ -1,4 +1,4 @@
-import { hasSupabaseServiceCredential } from "@/lib/supabase/service-env";
+import { hasSupabaseServiceCredential } from "@/lib/supabase/service-readiness";
 
 const DEFAULT_LEKTA_URL = "https://lektahr.netlify.app";
 
