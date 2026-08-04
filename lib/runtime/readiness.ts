@@ -1,3 +1,5 @@
+import { hasSupabaseServiceCredential } from "@/lib/supabase/service-env";
+
 const DEFAULT_LEKTA_URL = "https://lektahr.netlify.app";
 
 export const PRODUCTION_ACCEPTANCE_CONTRACT = "epic-12.5";
@@ -33,9 +35,7 @@ export function productionReadiness(env: NodeJS.ProcessEnv = process.env) {
     env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
       env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
   );
-  const serviceCredentialConfigured = Boolean(
-    env.SUPABASE_SECRET_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
-  );
+  const serviceCredentialConfigured = hasSupabaseServiceCredential(env);
 
   const checks = {
     completionOriginConfigured: Boolean(completionOrigin),
