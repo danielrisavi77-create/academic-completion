@@ -5,7 +5,7 @@ import {
   type CompletionLektaFindingRow,
   type LektaCheckRow,
 } from "@/domain/lekta/persistence";
-import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { CompletionPersistenceError } from "@/lib/persistence/completion-repository";
 
 const CHECK_SELECT = [
@@ -33,9 +33,9 @@ const FINDING_SELECT = [
 ].join(",");
 
 export async function hydrateProjectWithLekta(project: AcademicProject): Promise<AcademicProject> {
-  const admin = createAdminSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const [latestResult, findingsResult] = await Promise.all([
-    admin
+    supabase
       .from("lekta_checks")
       .select(CHECK_SELECT)
       .eq("project_id", project.id)
@@ -43,7 +43,7 @@ export async function hydrateProjectWithLekta(project: AcademicProject): Promise
       .order("checked_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    admin
+    supabase
       .from("completion_lekta_findings")
       .select(FINDING_SELECT)
       .eq("academic_project_id", project.id)

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { fpzgRuleset } from "@/data/rules/fpzg/ruleset";
 import { mapDatabaseProjectToDomain } from "@/domain/persistence/project-mapper";
 import type { CreateProjectFromScanCommand } from "@/domain/persistence/scan-project-draft";
@@ -206,9 +207,9 @@ export async function getOwnedProject({
   ownerUserId: string;
   projectId: string;
 }): Promise<AcademicProject | null> {
-  const admin = createAdminSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
-  const { data: projectData, error: projectError } = await admin
+  const { data: projectData, error: projectError } = await supabase
     .from("academic_projects")
     .select(PROJECT_SELECT)
     .eq("id", projectId)
@@ -223,12 +224,12 @@ export async function getOwnedProject({
 
   const [{ data: stateData, error: stateError }, { data: taskData, error: taskError }] =
     await Promise.all([
-      admin
+      supabase
         .from("completion_project_state")
         .select(STATE_SELECT)
         .eq("academic_project_id", projectId)
         .maybeSingle(),
-      admin
+      supabase
         .from("completion_tasks")
         .select(TASK_SELECT)
         .eq("academic_project_id", projectId)
@@ -262,8 +263,8 @@ export async function assertOwnedProject({
   ownerUserId: string;
   projectId: string;
 }) {
-  const admin = createAdminSupabaseClient();
-  const { data, error } = await admin
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
     .from("academic_projects")
     .select("id")
     .eq("id", projectId)
