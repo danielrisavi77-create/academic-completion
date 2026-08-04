@@ -35,3 +35,21 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          SUPABASE_SECRET_KEY: ci-supabase-server-credential-marker
+          ANTHROPIC_API_KEY: ci-anthropic-server-credential-marker
+
+      - name: Ensure server credentials are not embedded in Next output
+        shell: bash
+        env:
+          SUPABASE_SECRET_KEY: ci-supabase-server-credential-marker
+          ANTHROPIC_API_KEY: ci-anthropic-server-credential-marker
+        run: |
+          if grep -R -qF "$SUPABASE_SECRET_KEY" .next; then
+            echo "Supabase server credential marker was embedded in the Next build output."
+            exit 1
+          fi
+          if grep -R -qF "$ANTHROPIC_API_KEY" .next; then
+            echo "Anthropic server credential marker was embedded in the Next build output."
+            exit 1
+          fi
