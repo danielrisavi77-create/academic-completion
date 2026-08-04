@@ -1,0 +1,8 @@
+# Server-only credentials are supplied through Netlify's runtime environment.
+# These harmless build-only placeholders prevent all-scope UI secret values from
+# being exposed to Next/Netlify build plugins. netlify.toml environment values
+# are build configuration only and are not available to Functions at runtime.
+[build.environment]
+  SUPABASE_SECRET_KEY = "BUILD_ONLY_SUPABASE_SECRET_PLACEHOLDER"
+  SUPABASE_SERVICE_ROLE_KEY = "BUILD_ONLY_SUPABASE_LEGACY_PLACEHOLDER"
+  ANTHROPIC_API_KEY = "BUILD_ONLY_ANTHROPIC_SECRET_PLACEHOLDER"
