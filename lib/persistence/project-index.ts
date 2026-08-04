@@ -4,7 +4,7 @@ import {
   type ProjectIndexProjectRow,
   type ProjectIndexStateRow,
 } from "@/domain/project/project-index";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createAuthenticatedSupabaseDataClient } from "@/lib/supabase/server";
 
 const SUPPORTED_PROFILES = [
   "fpzg-politologija-zavrsni",
@@ -21,7 +21,7 @@ export class ProjectIndexPersistenceError extends Error {
 export async function listOwnedCompletionProjects(
   ownerUserId: string,
 ): Promise<ProjectIndexItem[]> {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createAuthenticatedSupabaseDataClient(ownerUserId);
 
   const { data: projectData, error: projectError } = await supabase
     .from("academic_projects")
