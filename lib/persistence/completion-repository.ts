@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createAuthenticatedSupabaseDataClient } from "@/lib/supabase/server";
 import { fpzgRuleset } from "@/data/rules/fpzg/ruleset";
 import { mapDatabaseProjectToDomain } from "@/domain/persistence/project-mapper";
 import type { CreateProjectFromScanCommand } from "@/domain/persistence/scan-project-draft";
@@ -207,7 +207,7 @@ export async function getOwnedProject({
   ownerUserId: string;
   projectId: string;
 }): Promise<AcademicProject | null> {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createAuthenticatedSupabaseDataClient(ownerUserId);
 
   const { data: projectData, error: projectError } = await supabase
     .from("academic_projects")
@@ -246,9 +246,6 @@ export async function getOwnedProject({
     throw new CompletionPersistenceError("Academic project exists without Completion App state.");
   }
 
-  // The Supabase client is intentionally schema-untyped in this repository.
-  // Treat database payloads as unknown at the adapter boundary, then validate
-  // canonical work type/profile/faculty semantics in mapDatabaseProjectToDomain.
   return mapDatabaseProjectToDomain({
     project: projectData as unknown as AcademicProjectRow,
     state: stateData as unknown as CompletionProjectStateRow,
@@ -263,7 +260,7 @@ export async function assertOwnedProject({
   ownerUserId: string;
   projectId: string;
 }) {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createAuthenticatedSupabaseDataClient(ownerUserId);
   const { data, error } = await supabase
     .from("academic_projects")
     .select("id")

@@ -1,5 +1,5 @@
 import type { AcademicProject } from "@/domain/project/types";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createAuthenticatedSupabaseDataClient } from "@/lib/supabase/server";
 import {
   buildLektaHandoffUrl,
   mintLektaHandoffCapability,
@@ -10,17 +10,6 @@ export class LektaWorkflowError extends Error {
     super(message);
     this.name = "LektaWorkflowError";
   }
-}
-
-async function authenticatedWorkflowClient(expectedUserId: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data.user || data.user.is_anonymous || data.user.id !== expectedUserId) {
-    throw new LektaWorkflowError("Authenticated Lekta workflow user mismatch.");
-  }
-
-  return supabase;
 }
 
 export async function prepareOwnedLektaHandoff({
@@ -37,7 +26,7 @@ export async function prepareOwnedLektaHandoff({
   }
 
   const capability = mintLektaHandoffCapability();
-  const supabase = await authenticatedWorkflowClient(userId);
+  const supabase = await createAuthenticatedSupabaseDataClient(userId);
   const { data, error } = await supabase.rpc("completion_prepare_lekta_handoff_user", {
     p_project: project.id,
     p_token_hash: capability.tokenHash,
@@ -65,7 +54,7 @@ export async function markOwnedLektaFindingChanged({
   projectId: string;
   issueKey: string;
 }) {
-  const supabase = await authenticatedWorkflowClient(userId);
+  const supabase = await createAuthenticatedSupabaseDataClient(userId);
   const { data, error } = await supabase.rpc("completion_mark_lekta_finding_changed_user", {
     p_project: projectId,
     p_issue_key: issueKey,
