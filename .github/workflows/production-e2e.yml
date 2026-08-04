@@ -31,6 +31,23 @@ jobs:
             exit 1
           fi
 
+      - name: Validate E2E configuration availability
+        shell: bash
+        run: |
+          missing=0
+          if [ -z "$COMPLETION_APP_URL" ]; then
+            echo "::error::COMPLETION_APP_URL is not available to this job. Add it as a repository or production-e2e environment variable."
+            missing=1
+          fi
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error::SUPABASE_SECRET_KEY is not available to this job. Add it as a repository Actions secret or production-e2e environment secret."
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "Production E2E configuration is available. Secret values were not printed."
+
       - name: Checkout
         uses: actions/checkout@v4
 
